@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if employee.pk %}
+        Edit Employee
+    {% else %}
+        Add Employee
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <h1>
+        {% if employee.pk %}
+            Edit Employee
+        {% else %}
+            Add Employee
+        {% endif %}
+    </h1>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% if employee.pk %}
+            <input type="hidden" name="id" value="{{ employee.pk }}">
+        {% endif %}
+
+        <div class="mb-3">
+            <label for="first_name" class="form-label">First Name</label>
+            <input type="text" class="form-control" id="first_name" name="first_name" value="{{ employee.first_name }}">
+        </div>
+
+        <div class="mb-3">
+            <label for="middle_name" class="form-label">Middle Name</label>
+            <input type="text" class="form-control" id="middle_name" name="middle_name" value="{{ employee.middle_name }}">
+        </div>
+
+        <div class="mb-3">
+            <label for="last_name" class="form-label">Last Name</label>
+            <input type="text" class="form-control" id="last_name" name="last_name" value="{{ employee.last_name }}">
+        </div>
+
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" value="{{ employee.email }}">
+        </div>
+
+        <div class="mb-3">
+            <label for="department" class="form-label">Department</label>
+            <select class="form-select" id="department" name="department">
+                {% for department in departments %}
+                    <option value="{{ department.pk }}" {% if employee.department_id == department.pk %}selected{% endif %}>{{ department.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="position" class="form-label">Position</label>
+            <select class="form-select" id="position" name="position">
+                {% for position in positions %}
+                    <option value="{{ position.pk }}" {% if employee.position_id == position.pk %}selected{% endif %}>{{ position.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="date_of_birth" class="form-label">Date of Birth</label>
+            <input type="date" class="form-control" id="date_of_birth" name="date_of_birth" value="{{ employee.date_of_birth }}">
+        </div>
+
+        <div class="mb-3">
+            <label for="hire_date" class="form-label">Hire Date</label>
+            <input type="date" class="form-control" id="hire_date" name="hire_date" value="{{ employee.hire_date }}">
+        </div>
+
+        <div class="mb-3">
+            <label for="salary" class="form-label">Salary</label>
+            <input type="number" class="form-control" id="salary" name="salary" value="{{ employee.salary }}">
+        </div>
+
+        <div class="mb-3">
+            <label for="is_active" class="form-label">Active</label>
+            <input type="checkbox" class="form-check-input" id="is_active" name="is_active" {% if employee.is_active %}checked{% endif %}>
+        </div>
+
+        <div class="mb-3">
+            <label for="picture" class="form-label">Picture</label>
+            <input type="file" class="form-control" id="picture" name="picture">
+            {% if employee.picture %}
+                <img src="{{ employee.picture.url }}" alt="Employee Picture" class="mt-2" style="max-width: 200px;">
+            {% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a href="{% url 'employee_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+{% endblock %}

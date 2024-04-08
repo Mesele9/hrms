@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Positions{% endblock %}
+
+{% block content %}
+<h1>Positions</h1>
+<a href="{% url 'position_create' %}" class="btn btn-primary mb-3">Add Position</a>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for position in positions %}
+        <tr>
+            <td>{{ position.name }}</td>
+            <td>
+                <a href="{% url 'position_update' pk=position.pk %}" class="btn btn-primary btn-sm">Edit</a>
+                <a href="{% url 'position_delete' pk=position.pk %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this position?')">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
