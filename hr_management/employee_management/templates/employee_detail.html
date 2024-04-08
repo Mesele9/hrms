@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}{{ employee.full_name }}{% endblock %}
+
+{% block content %}
+<h1>{{ employee.first_name }} {{ employee.middle_name }} {{ employee.last_name }}</h1>
+<table class="table table-striped">
+    <tbody>
+        <tr>
+            <th>Position:</th>
+            <td>{{ employee.position }}</td>
+        </tr>
+        <tr>
+            <th>Department:</th>
+            <td>{{ employee.department }}</td>
+        </tr>
+        <tr>
+            <th>Date of Birth:</th>
+            <td>{{ employee.date_of_birth }}</td>
+        </tr>
+        <tr>
+            <th>Hire Date:</th>
+            <td>{{ employee.hire_date }}</td>
+        </tr>
+        <tr>
+            <th>Salary:</th>
+            <td>{{ employee.salary }}</td>
+        </tr>
+        <tr>
+            <th>Active:</th>
+            <td>{% if employee.is_active %}Yes{% else %}No{% endif %}</td>
+        </tr>
+        <tr>
+            <th>Picture:</th>
+            <td>
+                {% if employee.picture %}
+                <img src="{{ employee.picture.url }}" alt="Employee Picture" width="200">
+                {% else %}
+                No Picture
+                {% endif %}
+            </td>
+        </tr>
+    </tbody>
+</table>
+{% endblock %}

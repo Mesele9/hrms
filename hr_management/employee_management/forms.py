@@ -1,5 +1,5 @@
 from django import forms
-from .models import Employee, Department, Position
+from .models import Employee, Department, Position, Document, LeaveRequest
 
 
 class DepartmentForm(forms.ModelForm):
@@ -12,7 +12,6 @@ class PositionForm(forms.ModelForm):
         model = Position
         fields = ['name']
 
-
 class EmployeeForm(forms.ModelForm):
     class Meta:
         model = Employee
@@ -23,10 +22,21 @@ class EmployeeForm(forms.ModelForm):
             'picture': forms.FileInput(attrs={'class': 'form-control'}),
         }
 
-    def __init__(self, *args, **kwargs):
-        super(EmployeeForm, self).__init__(*args, **kwargs)
-        instance = getattr(self, 'instance', None)
-        if instance and instance.pk:
-            # Update initial data for existing instance
-            self.fields['department'].queryset = Department.objects.all()
-            self.fields['position'].queryset = Position.objects.all()
+class DocumentForm(forms.ModelForm):
+    class Meta:
+        model = Document
+        fields = ['name', 'file', 'description', 'employee']
+        widgets = {
+            'file': forms.FileInput(attrs={'class': 'form-control-file'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+        }
+
+class LeaveRequestForm(forms.ModelForm):
+    class Meta:
+        model = LeaveRequest
+        fields = ['employee', 'start_date', 'end_date', 'reason', 'status']
+        widgets = {
+            'start_date': forms.DateInput(attrs={'type': 'date'}),
+            'end_date': forms.DateInput(attrs={'type': 'date'}),
+            'reason': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+        }

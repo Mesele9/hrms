@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 class Department(models.Model):
     name = models.CharField(max_length=50)
@@ -12,10 +13,10 @@ class Position(models.Model):
     def __str__(self):
         return self.name
 
-
 class Employee(models.Model):
+    #user = models.OneToOneField(User, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=50)
-    middle_name = models.CharField(max_length=50)
+    middle_name = models.CharField(max_length=50, null=True, blank=True)
     last_name = models.CharField(max_length=50)
     email = models.EmailField()
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
@@ -27,5 +28,29 @@ class Employee(models.Model):
     picture = models.ImageField(upload_to='employee_pictures/', null=True, blank=True)
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name}"
+        return f"{self.first_name} {self.middle_name} {self.last_name}"
+    
+    """  def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['picture'].widget.attrs.update({'class': 'form-control-file'}) """
 
+
+class Document(models.Model):
+    name = models.CharField(max_length=100)
+    file = models.FileField(upload_to='documents/')
+    description = models.TextField(blank=True)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    date_uploaded = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+
+class LeaveRequest(models.Model):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    reason = models.TextField()
+    status = models.CharField(max_length=20, choices=(('PENDING', 'Pending'), ('APPROVED', 'Approved'), ('REJECTED', 'Rejected')))
+
+    def __str__(self):
+        return f"{self.employee.first_name} {self.employee.last_name} - {self.start_date} to {self.end_date}"

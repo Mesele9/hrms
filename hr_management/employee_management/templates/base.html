@@ -11,20 +11,26 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'employee_list' %}">HR Management</a>
+            <a class="navbar-brand" href="{% url 'hrms:employee_list' %}">HR Management</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'employee_list' %}">Employees</a>
+                        <a class="nav-link" href="{% url 'hrms:employee_list' %}">Employees</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'department_list' %}">Departments</a>
+                        <a class="nav-link" href="{% url 'hrms:department_list' %}">Departments</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'position_list' %}">Positions</a>
+                        <a class="nav-link" href="{% url 'hrms:position_list' %}">Positions</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'hrms:document_list' %}">Documents</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'hrms:leave_request_list' %}">Leave Requests</a>
                     </li>
                 </ul>
             </div>
