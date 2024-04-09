@@ -4,7 +4,7 @@
 
 {% block content %}
 <h1>Departments</h1>
-<a href="{% url 'department_create' %}" class="btn btn-primary mb-3">Add Department</a>
+<a href="{% url 'hrms:department_create' %}" class="btn btn-primary mb-3">Add Department</a>
 <table class="table table-striped">
     <thead>
         <tr>
@@ -17,8 +17,8 @@
         <tr>
             <td>{{ department.name }}</td>
             <td>
-                <a href="{% url 'department_update' pk=department.pk %}" class="btn btn-primary btn-sm">Edit</a>
-                <a href="{% url 'department_delete' pk=department.pk %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this department?')">Delete</a>
+                <a href="{% url 'hrms:department_update' pk=department.pk %}" class="btn btn-primary btn-sm">Edit</a>
+                <a href="{% url 'hrms:department_delete' pk=department.pk %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this department?')">Delete</a>
             </td>
         </tr>
         {% endfor %}

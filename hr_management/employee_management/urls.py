@@ -3,7 +3,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path
 from .views import (
-    employee_list, employee_create, employee_update, employee_delete, employee_detail,
+    home, employee_list, employee_create, employee_update, employee_delete, employee_detail,
     department_list, department_create, department_update, department_delete,
     position_list, position_create, position_update, position_delete, 
     document_list, document_create, document_update, document_delete, 
@@ -13,6 +13,7 @@ from .views import (
 app_name = 'hrms'
 
 urlpatterns = [
+    path('', home, name='home'),
     # Employee Management
     path('employees/', employee_list, name='employee_list'),
     path('employees/create/', employee_create, name='employee_create'),

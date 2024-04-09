@@ -2,6 +2,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Employee, Department, Position, Document, LeaveRequest
 from .forms import EmployeeForm, DepartmentForm, PositionForm, DocumentForm, LeaveRequestForm
 
+def home(request):
+    return render(request, 'home.html')
+
 def employee_list(request):
     employees = Employee.objects.all()
     return render(request, 'employee_list.html', {'employees': employees})
