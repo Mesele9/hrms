@@ -7,7 +7,8 @@ def home(request):
 
 def employee_list(request):
     employees = Employee.objects.all()
-    return render(request, 'employee_list.html', {'employees': employees})
+    departments = Department.objects.all()
+    return render(request, 'employee_list.html', {'employees': employees, 'departments': departments})
 
 def employee_create(request):
     if request.method == 'POST':

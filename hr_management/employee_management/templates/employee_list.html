@@ -2,79 +2,102 @@
 {% block title %}Employees{% endblock %}
 {% block content %}
 <div class="container-fluid">
-  <div class="row">
-    
-
     <div class="row">
-        <div class="col-md-3"><a href="{% url 'hrms:employee_create' %}" class="btn btn-primary mb-3">Add Employee</a></div>
+        <div class="col-md-3">
+            <a href="{% url 'hrms:employee_create' %}" class="btn btn-primary mb-3">Add Employee</a>
+        </div>
         <div class="col-md-9">
-        <form class="d-flex">
-        <input class="form-control me-2" type="search" placeholder="Search by name" aria-label="Search" id="search-input">
-        <button class="btn btn-outline-success" type="button" onclick="searchEmployees()">Search</button>
-      </form>
+            <form class="d-flex">
+                <input class="form-control me-2" type="search" placeholder="Search by name" aria-label="Search" id="search-input">
+                <button class="btn btn-outline-success" type="button" onclick="searchEmployees()">Search</button>
+            </form>
+        </div>
     </div>
-    
-    
-  <div class="row">
-    <div class="row text-center"><h2>Employee Lists</h2></div>
+    <div class="row">
+        <div class="col-md-12">
+            <label for="department-filter">Filter by Department:</label>
+            <select class="form-select mb-3" id="department-filter" onchange="filterEmployeesByDepartment()">
+                <option value="">All Departments</option>
+                {% for department in departments %}
+                    <option value="{{ department.id }}">{{ department.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <div class="row text-center">
+        <h2>Employee Lists</h2>
+    </div>
     <div class="col-md-12">
-      <table class="table table-striped">
-        
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Position</th>
-            <th>Department</th>
-            <th>Date of Birth</th>
-            <th>Picture</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="search-results">
-          {% for employee in employees %}
-          <tr>
-            <td><a href="{% url 'hrms:employee_detail' employee.pk %}">{{ employee.first_name }} {{ employee.middle_name }}</a></td>
-            <td>{{ employee.position }}</td>
-            <td>{{ employee.department }}</td>
-            <td>{{ employee.date_of_birth }}</td>
-            <td>
-                {% if employee.picture %}
-                <img src="{{ employee.picture.url }}" alt="Employee Picture" width="100">
-                {% else %}
-                No Picture
-                {% endif %}
-            </td>
-            <td><a href="{% url 'hrms:employee_update' employee.pk %}" class="btn btn-primary btn-sm">Edit</a> <a href="{% url 'hrms:employee_delete' employee.pk %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this employee?')">Delete</a></td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Position</th>
+                    <th>Department</th>
+                    <th>Date of Birth</th>
+                    <th>Picture</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="employee-table-body">
+                {% for employee in employees %}
+                <tr data-department-id="{{ employee.department.id }}">
+                    <td><a href="{% url 'hrms:employee_detail' employee.pk %}">{{ employee.first_name }} {{ employee.middle_name }}</a></td>
+                    <td>{{ employee.position }}</td>
+                    <td>{{ employee.department.name }}</td>
+                    <td>{{ employee.date_of_birth }}</td>
+                    <td>
+                        {% if employee.picture %}
+                            <img src="{{ employee.picture.url }}" alt="Employee Picture" width="100">
+                        {% else %}
+                            No Picture
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'hrms:employee_update' employee.pk %}" class="btn btn-primary btn-sm">Edit</a>
+                        <a href="{% url 'hrms:employee_delete' employee.pk %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this employee?')">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
-  </div>
 </div>
 
 <script>
-  function searchEmployees() {
-    const searchInput = document.getElementById('search-input');
-    const searchTerm = searchInput.value.toLowerCase();
-    const searchResults = document.getElementById('search-results');
+    function searchEmployees() {
+        const searchInput = document.getElementById('search-input');
+        const searchTerm = searchInput.value.toLowerCase();
+        const employeeRows = document.querySelectorAll('#employee-table-body tr');
 
-    Array.from(searchResults.rows).forEach(row => {
-      const nameCell = row.cells[0];
-      const name = nameCell.innerText.toLowerCase();
+        employeeRows.forEach(row => {
+            const nameCell = row.cells[0];
+            const name = nameCell.innerText.toLowerCase();
 
-      if (name.includes(searchTerm)) {
-        row.style.display = '';
-      } else {
-        row.style.display = 'none';
-      }
-    });
-  }
+            if (name.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
 
-  document.getElementById('search-input').addEventListener('input', searchEmployees);
+    function filterEmployeesByDepartment() {
+        const selectedDepartmentId = document.getElementById('department-filter').value;
+        const employeeRows = document.querySelectorAll('#employee-table-body tr');
 
-  
+        employeeRows.forEach(row => {
+            const departmentId = row.dataset.departmentId;
+
+            if (selectedDepartmentId === '' || departmentId === selectedDepartmentId) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    document.getElementById('search-input').addEventListener('input', searchEmployees);
 </script>
 
 {% endblock %}
-
