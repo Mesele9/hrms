@@ -6,9 +6,27 @@ def home(request):
     return render(request, 'home.html')
 
 def employee_list(request):
-    employees = Employee.objects.all()
-    departments = Department.objects.all()
-    return render(request, 'employee_list.html', {'employees': employees, 'departments': departments})
+    all_employees = Employee.objects.all()
+    active_employees = all_employees.filter(is_active=True)
+    inactive_employees = all_employees.filter(is_active=False)
+    
+    departments = Department.objects.all()    
+    
+    status_filter = request.GET.get('status', 'active')
+    if status_filter == 'inactive':
+        employees = inactive_employees
+    elif status_filter == 'all':
+        employees = all_employees
+    else:
+        employees = active_employees
+
+    context = {
+        'employees': employees,
+        'departments': departments,
+        'status_filter': status_filter,
+    }
+    
+    return render(request, 'employee_list.html', context)
 
 def employee_create(request):
     if request.method == 'POST':
