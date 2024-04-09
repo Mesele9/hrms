@@ -7,6 +7,13 @@
             <a href="{% url 'hrms:employee_create' %}" class="btn btn-primary mb-3">Add Employee</a>
         </div>
         
+        <div class="col-md-9">
+            <form class="d-flex">
+                <input class="form-control me-2" type="search" placeholder="Search by name" aria-label="Search" id="search-input">
+                <button class="btn btn-outline-success" type="button" onclick="searchEmployees()">Search</button>
+            </form>
+        </div>
+
     </div>
     <div class="row">
         <div class="col-md-12">

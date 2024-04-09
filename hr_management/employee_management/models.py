@@ -14,10 +14,17 @@ class Position(models.Model):
         return self.name
 
 class Employee(models.Model):
+
+    GENDER_CHOICES = (
+        ('M', 'Male'),
+        ('F', 'Female'),
+    )
+
     #user = models.OneToOneField(User, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=50)
     middle_name = models.CharField(max_length=50, null=True, blank=True)
     last_name = models.CharField(max_length=50)
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, default="")
     email = models.EmailField()
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
     position = models.ForeignKey(Position, on_delete=models.CASCADE)

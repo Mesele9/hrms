@@ -15,7 +15,7 @@ class PositionForm(forms.ModelForm):
 class EmployeeForm(forms.ModelForm):
     class Meta:
         model = Employee
-        fields = ['first_name', 'middle_name', 'last_name', 'email', 'department', 'position', 'date_of_birth', 'hire_date', 'salary', 'is_active', 'picture']
+        fields = ['first_name', 'middle_name', 'last_name', 'gender', 'email', 'department', 'position', 'date_of_birth', 'hire_date', 'salary', 'is_active', 'picture']
         widgets = {
             'date_of_birth': forms.DateInput(attrs={'type': 'date'}),
             'hire_date': forms.DateInput(attrs={'type': 'date'}),
