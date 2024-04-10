@@ -33,41 +33,60 @@
                 </ul>
             </div>
         </nav>
-
-        <!-- Main content area -->
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h1 class="h2">Employee Dashboard</h1>
-            </div>
-
-            <div class="row">
-                <!-- Department chart -->
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header">
-                            Employees by Department
-                        </div>
-                        <div class="card-body">
-                            <canvas id="departmentChart" width="400" height="400"></canvas>
-                        </div>
-                    </div>
+    </div>
+<div class="container">
+    <div class="row">
+        <div class="col-md-9 text-center">
+            <h2>Total Employees: {{ total_employees }}</h2>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    Employees by Department
                 </div>
-
-                <!-- Gender chart -->
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header">
-                            Employees by Gender
-                        </div>
-                        <div class="card-body">
-                            <canvas id="genderChart" width="400" height="400"></canvas>
-                        </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-center align-items-center mb-3">
+                        <canvas id="departmentChart" width="200" height="200"></canvas>
                     </div>
+                    <ul class="list-group ml-3">
+                        {% for data in department_data %}
+                            <li class="list-group-item">
+                                {{ data.department__name }}: {{ data.employee_count }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="card-footer text-muted">
+                    Total Employees: {{ total_employees }}
                 </div>
             </div>
-        </main>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    Employees by Gender
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-center align-items-center mb-3">
+                        <canvas id="genderChart" width="200" height="200"></canvas>
+                    </div>
+                    <ul class="list-group ml-3">
+                        <li class="list-group-item">Male: {{ male_count }}</li>
+                        <li class="list-group-item">Female: {{ female_count }}</li>
+                    </ul>
+                </div>
+                <div class="card-footer text-muted">
+                    Total Employees: {{ total_employees }}
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>

@@ -24,7 +24,9 @@ def home(request):
 
 def dashboard(request):
     # Total number of employees
-    total_employees = Employee.objects.count()
+    total_employees = Employee.objects.all().filter(is_active=True).count()
+    #total_employees = active_employees.filter(is_active=True).count()
+    #total_employees = Employee.objects.count()
 
     # Employees by department
     department_data = Employee.objects.values('department__name').annotate(employee_count=Count('id'))
