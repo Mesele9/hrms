@@ -1,8 +1,115 @@
 {% extends 'base.html' %}
 
-{% block title %}HR Management{% endblock %}
+{% block title %}Dashboard{% endblock %}
 
 {% block content %}
-<h1>Welcome to HR Management</h1>
-<p>Please use the navigation bar at the top to access the different parts of the application.</p>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+            <div class="position-sticky">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'hrms:employee_list' %}">
+                            Employees
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'hrms:department_list' %}">
+                            Departments
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'hrms:position_list' %}">
+                            Positions
+                        </a>
+                    </li>
+                    <!-- Add more sidebar links as needed -->
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main content area -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Employee Dashboard</h1>
+            </div>
+
+            <div class="row">
+                <!-- Department chart -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            Employees by Department
+                        </div>
+                        <div class="card-body">
+                            <canvas id="departmentChart" width="400" height="400"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gender chart -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            Employees by Gender
+                        </div>
+                        <div class="card-body">
+                            <canvas id="genderChart" width="400" height="400"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Department chart
+        var departmentData = {
+            labels: Object.keys({{ department_data|safe }}),
+            datasets: [{
+                data: Object.values({{ department_data|safe }}),
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.7)',
+                    'rgba(54, 162, 235, 0.7)',
+                    'rgba(255, 206, 86, 0.7)',
+                    'rgba(75, 192, 192, 0.7)',
+                    'rgba(153, 102, 255, 0.7)',
+                ],
+            }],
+        };
+
+        var departmentChartCanvas = document.getElementById('departmentChart').getContext('2d');
+        var departmentChart = new Chart(departmentChartCanvas, {
+            type: 'pie',
+            data: departmentData,
+        });
+
+        // Gender chart
+        var genderData = {
+            labels: ['Male', 'Female'],
+            datasets: [{
+                data: [{{ male_count }}, {{ female_count }}],
+                backgroundColor: [
+                    'rgba(54, 162, 235, 0.7)',
+                    'rgba(255, 99, 132, 0.7)',
+                ],
+            }],
+        };
+
+        var genderChartCanvas = document.getElementById('genderChart').getContext('2d');
+        var genderChart = new Chart(genderChartCanvas, {
+            type: 'pie',
+            data: genderData,
+        });
+    });
+</script>
 {% endblock %}

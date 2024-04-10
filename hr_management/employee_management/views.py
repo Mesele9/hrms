@@ -1,9 +1,47 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.db.models import Count
 from .models import Employee, Department, Position, Document, LeaveRequest
 from .forms import EmployeeForm, DepartmentForm, PositionForm, DocumentForm, LeaveRequestForm
 
 def home(request):
-    return render(request, 'home.html')
+    # Retrieve total number of employees in each department
+    departments = Department.objects.all()
+    department_data = {}
+    for department in departments:
+        department_data[department.name] = Employee.objects.filter(department=department).count()
+
+    # Retrieve total number of male and female employees
+    male_count = Employee.objects.filter(gender='M').count()
+    female_count = Employee.objects.filter(gender='F').count()
+
+    context = {
+        'department_data': department_data,
+        'male_count': male_count,
+        'female_count': female_count,
+    }
+    return render(request, 'home.html', context)
+
+
+def dashboard(request):
+    # Total number of employees
+    total_employees = Employee.objects.count()
+
+    # Employees by department
+    department_data = Employee.objects.values('department__name').annotate(employee_count=Count('id'))
+
+    # Employees by gender
+    male_count = Employee.objects.filter(gender='M').count()
+    female_count = Employee.objects.filter(gender='F').count()
+
+    context = {
+        'department_data': department_data,
+        'total_employees': total_employees,
+        'male_count': male_count,
+        'female_count': female_count,
+    }
+
+    return render(request, 'dashboard.html', context)
+
 
 def employee_list(request):
     all_employees = Employee.objects.all()

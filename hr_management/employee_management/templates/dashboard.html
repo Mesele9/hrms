@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-9">
+            <h2>Total Employees: {{ total_employees }}</h2>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    Employees by Department
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-center align-items-center mb-3">
+                        <canvas id="departmentChart" width="200" height="200"></canvas>
+                    </div>
+                    <ul class="list-group ml-3">
+                        {% for data in department_data %}
+                            <li class="list-group-item">
+                                {{ data.department__name }}: {{ data.employee_count }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="card-footer text-muted">
+                    Total Employees: {{ total_employees }}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    Employees by Gender
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-center align-items-center mb-3">
+                        <canvas id="genderChart" width="200" height="200"></canvas>
+                    </div>
+                    <ul class="list-group ml-3">
+                        <li class="list-group-item">Male: {{ male_count }}</li>
+                        <li class="list-group-item">Female: {{ female_count }}</li>
+                    </ul>
+                </div>
+                <div class="card-footer text-muted">
+                    Total Employees: {{ total_employees }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Department Pie Chart
+        var departmentLabels = [];
+        var departmentCounts = [];
+
+        {% for data in department_data %}
+            departmentLabels.push("{{ data.department__name }}");
+            departmentCounts.push({{ data.employee_count }});
+        {% endfor %}
+
+        var departmentCtx = document.getElementById('departmentChart').getContext('2d');
+        var departmentChart = new Chart(departmentCtx, {
+            type: 'pie',
+            data: {
+                labels: departmentLabels,
+                datasets: [{
+                    label: 'Employees by Department',
+                    data: departmentCounts,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.5)',
+                        'rgba(54, 162, 235, 0.5)',
+                        'rgba(255, 206, 86, 0.5)',
+                        'rgba(75, 192, 192, 0.5)',
+                        'rgba(153, 102, 255, 0.5)',
+                        'rgba(255, 159, 64, 0.5)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+
+        // Gender Pie Chart
+        var genderLabels = ['Male', 'Female'];
+        var genderCounts = [{{ male_count }}, {{ female_count }}];
+
+        var genderCtx = document.getElementById('genderChart').getContext('2d');
+        var genderChart = new Chart(genderCtx, {
+            type: 'pie',
+            data: {
+                labels: genderLabels,
+                datasets: [{
+                    label: 'Employees by Gender',
+                    data: genderCounts,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.5)',
+                        'rgba(54, 162, 235, 0.5)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+    });
+</script>
+{% endblock %}
