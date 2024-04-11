@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators  import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Count
 from .models import Employee, Department, Position, Document, LeaveRequest
@@ -5,7 +6,7 @@ from .forms import EmployeeForm, DepartmentForm, PositionForm, DocumentForm, Lea
 
 def home(request):
     # Retrieve total number of employees in each department
-    departments = Department.objects.all()
+    """ departments = Department.objects.all()
     department_data = {}
     for department in departments:
         department_data[department.name] = Employee.objects.filter(department=department).count()
@@ -18,10 +19,11 @@ def home(request):
         'department_data': department_data,
         'male_count': male_count,
         'female_count': female_count,
-    }
-    return render(request, 'home.html', context)
+    } """
+    return render(request, 'home.html')
 
 
+@login_required
 def dashboard(request):
     # Total number of employees
     total_employees = Employee.objects.all().filter(is_active=True).count()
@@ -45,6 +47,7 @@ def dashboard(request):
     return render(request, 'dashboard.html', context)
 
 
+@login_required
 def employee_list(request):
     all_employees = Employee.objects.all()
     active_employees = all_employees.filter(is_active=True)
@@ -68,6 +71,8 @@ def employee_list(request):
     
     return render(request, 'employee_list.html', context)
 
+
+@login_required
 def employee_create(request):
     if request.method == 'POST':
         form = EmployeeForm(request.POST, request.FILES)
@@ -78,6 +83,8 @@ def employee_create(request):
         form = EmployeeForm()
     return render(request, 'employee_form.html', {'form': form})
 
+
+@login_required
 def employee_update(request, pk):
     employee = get_object_or_404(Employee, pk=pk)
     if request.method == 'POST':
@@ -89,19 +96,27 @@ def employee_update(request, pk):
         form = EmployeeForm(instance=employee)
     return render(request, 'employee_form.html', {'form': form})
 
+
+@login_required
 def employee_delete(request, pk):
     employee = get_object_or_404(Employee, pk=pk)
     employee.delete()
     return redirect('hrms:employee_list')
 
+
+@login_required
 def employee_detail(request, pk):
     employee = get_object_or_404(Employee, pk=pk)
     return render(request, 'employee_detail.html', {'employee': employee})
 
+
+@login_required
 def department_list(request):
     departments = Department.objects.all()
     return render(request, 'department_list.html', {'departments': departments})
 
+
+@login_required
 def department_create(request):
     if request.method == 'POST':
         form = DepartmentForm(request.POST)
@@ -112,6 +127,8 @@ def department_create(request):
         form = DepartmentForm()
     return render(request, 'department_form.html', {'form': form})
 
+
+@login_required
 def department_update(request, pk):
     department = get_object_or_404(Department, pk=pk)
     if request.method == 'POST':
@@ -123,15 +140,21 @@ def department_update(request, pk):
         form = DepartmentForm(instance=department)
     return render(request, 'department_form.html', {'form': form})
 
+
+@login_required
 def department_delete(request, pk):
     department = get_object_or_404(Department, pk=pk)
     department.delete()
     return redirect('hrms:department_list')
 
+
+@login_required
 def position_list(request):
     positions = Position.objects.all()
     return render(request, 'position_list.html', {'positions': positions})
 
+
+@login_required
 def position_create(request):
     if request.method == 'POST':
         form = PositionForm(request.POST)
@@ -142,6 +165,8 @@ def position_create(request):
         form = PositionForm()
     return render(request, 'position_form.html', {'form': form})
 
+
+@login_required
 def position_update(request, pk):
     position = get_object_or_404(Position, pk=pk)
     if request.method == 'POST':
@@ -153,15 +178,21 @@ def position_update(request, pk):
         form = PositionForm(instance=position)
     return render(request, 'position_form.html', {'form': form})
 
+
+@login_required
 def position_delete(request, pk):
     position = get_object_or_404(Position, pk=pk)
     position.delete()
     return redirect('hrms:position_list')
 
+
+@login_required
 def document_list(request):
     documents = Document.objects.all()
     return render(request, 'document_list.html', {'documents': documents})
 
+
+@login_required
 def document_create(request):
     if request.method == 'POST':
         form = DocumentForm(request.POST, request.FILES)
@@ -172,6 +203,8 @@ def document_create(request):
         form = DocumentForm()
     return render(request, 'document_form.html', {'form': form})
 
+
+@login_required
 def document_update(request, pk):
     document = get_object_or_404(Document, pk=pk)
     if request.method == 'POST':
@@ -183,15 +216,21 @@ def document_update(request, pk):
         form = DocumentForm(instance=document)
     return render(request, 'document_form.html', {'form': form})
 
+
+@login_required
 def document_delete(request, pk):
     document = get_object_or_404(Document, pk=pk)
     document.delete()
     return redirect('document_list')
 
+
+@login_required
 def leave_request_list(request):
     leave_requests = LeaveRequest.objects.all()
     return render(request, 'leave_request_list.html', {'leave_requests': leave_requests})
 
+
+@login_required
 def leave_request_create(request):
     if request.method == 'POST':
         form = LeaveRequestForm(request.POST)
@@ -202,6 +241,8 @@ def leave_request_create(request):
         form = LeaveRequestForm()
     return render(request, 'leave_request_form.html', {'form': form})
 
+
+@login_required
 def leave_request_update(request, pk):
     leave_request = get_object_or_404(LeaveRequest, pk=pk)
     if request.method == 'POST':
@@ -213,6 +254,8 @@ def leave_request_update(request, pk):
         form = LeaveRequestForm(instance=leave_request)
     return render(request, 'leave_request_form.html', {'form': form})
 
+
+@login_required
 def leave_request_delete(request, pk):
     leave_request = get_object_or_404(LeaveRequest, pk=pk)
     leave_request.delete()
