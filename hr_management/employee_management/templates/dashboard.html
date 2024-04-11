@@ -55,6 +55,19 @@
     </div>
 </div>
 
+<div class="col-md-6">
+            <h2>Upcoming Birthdays</h2>
+            <ul class="list-group">
+                {% for employee in upcoming_birthdays %}
+                    <li class="list-group-item">
+                        {{ employee.first_name }} {{ employee.last_name }} - {{ employee.date_of_birth|date:"F d" }}
+                    </li>
+                {% empty %}
+                    <li class="list-group-item">No upcoming birthdays</li>
+                {% endfor %}
+            </ul>
+        </div>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

@@ -1,6 +1,9 @@
+import re
 from django.contrib.auth.decorators  import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Count
+from django.utils.timezone import now
+from datetime import timedelta, datetime
 from .models import Employee, Department, Position, Document, LeaveRequest
 from .forms import EmployeeForm, DepartmentForm, PositionForm, DocumentForm, LeaveRequestForm
 
@@ -23,9 +26,12 @@ def home(request):
     return render(request, 'home.html')
 
 
+
+
 @login_required
 def dashboard(request):
     # Total number of employees
+    active_employees = Employee.objects.all().filter(is_active=True)
     total_employees = Employee.objects.all().filter(is_active=True).count()
     #total_employees = active_employees.filter(is_active=True).count()
     #total_employees = Employee.objects.count()
@@ -34,14 +40,23 @@ def dashboard(request):
     department_data = Employee.objects.values('department__name').annotate(employee_count=Count('id'))
 
     # Employees by gender
-    male_count = Employee.objects.filter(gender='M').count()
-    female_count = Employee.objects.filter(gender='F').count()
+    male_count = active_employees.filter(gender='M').count()
+    female_count = active_employees.filter(gender='F').count()
+    
+    today = datetime.today()
+    next_week = today + timedelta(days=7)
+    upcoming_birthdays = Employee.objects.filter(
+        date_of_birth__month=today.month,
+        date_of_birth__day__in=range(today.day, next_week.day)
+    ).order_by('-date_of_birth')
 
+    
     context = {
         'department_data': department_data,
         'total_employees': total_employees,
         'male_count': male_count,
         'female_count': female_count,
+        'upcoming_birthdays': upcoming_birthdays
     }
 
     return render(request, 'dashboard.html', context)
