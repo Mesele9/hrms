@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}Document Detail{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>{{ document.name }}</h2>
+    <p>Description: {{ document.description }}</p>
+    <p>Date Uploaded: {{ document.date_uploaded }}</p>
+    <!-- Display other document information -->
+
+    <a href="{{ document.file.url }}" target="_blank">View Document</a>
+    <br><br>
+    <a href="{% url 'hrms:document_update' document.pk %}">Edit Document</a>
+    <br><br>
+    <a href="{% url 'hrms:document_delete' document.pk %}">Delete Document</a>
+</div>
+{% endblock %}

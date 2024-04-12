@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}Document List{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Document List</h2>
+
+    <!-- Search Form -->
+    <form method="GET" action="{% url 'hrms:document_list' %}">
+        <input type="text" name="search_query" placeholder="Search by name...">
+        <button type="submit">Search</button>
+    </form>
+
+
+
+    <!-- Document Table -->
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Employee</th>
+                <th>Date Uploaded</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for document in documents %}
+                <tr>
+                    <td>{{ document.name }}</td>
+                    <td>{{ document.employee }}</td>
+                    <td>{{ document.date_uploaded }}</td>
+                    <td>
+                        <a href="{% url 'hrms:document_update' document.pk %}" class="btn btn-sm btn-info">Edit</a>
+                        <button class="btn btn-sm btn-danger" onclick="confirmDelete('{{ document.name }}', '{{ document.pk }}')">Delete</button>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4">No documents found.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- JavaScript for Delete Confirmation -->
+<script>
+    function confirmDelete(name, pk) {
+        if (confirm(`Are you sure you want to delete the document "${name}"?`)) {
+            window.location.href = `/documents/delete/${pk}/`;
+        }
+    }
+</script>
+{% endblock %}

@@ -25,7 +25,7 @@ class EmployeeForm(forms.ModelForm):
 class DocumentForm(forms.ModelForm):
     class Meta:
         model = Document
-        fields = ['name', 'file', 'description', 'employee']
+        fields = ['name', 'file', 'description']
         widgets = {
             'file': forms.FileInput(attrs={'class': 'form-control-file'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),

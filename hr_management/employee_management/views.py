@@ -33,8 +33,6 @@ def dashboard(request):
     # Total number of employees
     active_employees = Employee.objects.all().filter(is_active=True)
     total_employees = Employee.objects.all().filter(is_active=True).count()
-    #total_employees = active_employees.filter(is_active=True).count()
-    #total_employees = Employee.objects.count()
 
     # Employees by department
     department_data = Employee.objects.values('department__name').annotate(employee_count=Count('id'))
@@ -122,7 +120,10 @@ def employee_delete(request, pk):
 @login_required
 def employee_detail(request, pk):
     employee = get_object_or_404(Employee, pk=pk)
-    return render(request, 'employee_detail.html', {'employee': employee})
+    documents = Document.objects.filter(employee=employee)
+    return render(request, 'employee_detail.html', {'employee': employee, 'documents': documents})
+    """employee = get_object_or_404(Employee, pk=pk)
+    return render(request, 'employee_detail.html', {'employee': employee})"""
 
 
 @login_required
@@ -204,19 +205,31 @@ def position_delete(request, pk):
 @login_required
 def document_list(request):
     documents = Document.objects.all()
-    return render(request, 'document_list.html', {'documents': documents})
+    employee = Employee.objects.first()  # Example: Get the first employee
+
+    search_query = request.GET.get('search_query')
+    if search_query:
+        documents = documents.filter(name__icontains=search_query)
+
+    return render(request, 'document_list.html', {'documents': documents, 'employee': employee})
 
 
 @login_required
-def document_create(request):
+def document_create(request, employee_id):
+    employee = Employee.objects.get(pk=employee_id)
+
     if request.method == 'POST':
         form = DocumentForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
-            return redirect('document_list')
+            document = form.save(commit=False)
+
+            document.employee_id = employee_id  # Associate the document with the employee
+            document.save()
+            return redirect('hrms:employee_detail', pk=employee_id)
     else:
         form = DocumentForm()
-    return render(request, 'document_form.html', {'form': form})
+
+    return render(request, 'document_form.html', {'form': form, 'employee': employee})
 
 
 @login_required
@@ -226,7 +239,7 @@ def document_update(request, pk):
         form = DocumentForm(request.POST, request.FILES, instance=document)
         if form.is_valid():
             form.save()
-            return redirect('document_list')
+            return redirect('hrms:document_list')
     else:
         form = DocumentForm(instance=document)
     return render(request, 'document_form.html', {'form': form})
@@ -236,8 +249,12 @@ def document_update(request, pk):
 def document_delete(request, pk):
     document = get_object_or_404(Document, pk=pk)
     document.delete()
-    return redirect('document_list')
+    return redirect('hrms:document_list')
 
+
+def document_detail(request, pk):
+    document = get_object_or_404(Document, pk=pk)
+    return render(request, 'document_detail.html', {'document': document})
 
 @login_required
 def leave_request_list(request):

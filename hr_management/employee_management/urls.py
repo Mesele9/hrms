@@ -7,7 +7,7 @@ from .views import (
     home, dashboard, employee_list, employee_create, employee_update, employee_delete, employee_detail,
     department_list, department_create, department_update, department_delete,
     position_list, position_create, position_update, position_delete, 
-    document_list, document_create, document_update, document_delete, 
+    document_list, document_create, document_update, document_delete, document_detail,
     leave_request_list, leave_request_create, leave_request_update, leave_request_delete,
 )
 
@@ -42,10 +42,11 @@ urlpatterns = [
 
     # Document Management
     path('documents/', document_list, name='document_list'),
-    path('documents/create/', document_create, name='document_create'),
+    path('documents/create/<int:employee_id>/', document_create, name='document_create'),
     path('documents/update/<int:pk>/', document_update, name='document_update'),
     path('documents/delete/<int:pk>/', document_delete, name='document_delete'),
-    #path('documents/detail/<int:pk>/', document_detail, name='document_detail'),
+    #path('employees/detail/<int:pk>/', employee_detail_with_documents, name='employee_detail_with_documents'),
+    path('documents/detail/<int:pk>/', document_detail, name='document_detail'),
 
     # Leave Management
     path('leave_requests/', leave_request_list, name='leave_request_list'),

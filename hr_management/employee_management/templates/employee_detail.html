@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}{{ employee.full_name }}{% endblock %}
+{% block title %}{{ employee.first_name }}{% endblock %}
 
 {% block content %}
 <h1>{{ employee.first_name }} {{ employee.middle_name }} {{ employee.last_name }}</h1>
@@ -45,4 +45,25 @@
         </tr>
     </tbody>
 </table>
+
+
+<div class="container">
+    <a href="{% url 'hrms:document_create' employee_id=employee.pk %}">Upload New Document</a>
+
+    {% if documents %}
+        <h3>Documents</h3>
+        <ul>
+            {% for document in documents %}
+                <li>
+                    <a href="{{ document.file.url }}" target="_blank">{{ document.name }}</a>
+                    <p>Description: {{ document.description }}</p>
+                    <p>Date Uploaded: {{ document.date_uploaded }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No documents uploaded for this employee.</p>
+    {% endif %}
+
+
 {% endblock %}
