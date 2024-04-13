@@ -35,7 +35,7 @@ def dashboard(request):
     total_employees = Employee.objects.all().filter(is_active=True).count()
 
     # Employees by department
-    department_data = Employee.objects.values('department__name').annotate(employee_count=Count('id'))
+    department_data = active_employees.values('department__name').annotate(employee_count=Count('id'))
 
     # Employees by gender
     male_count = active_employees.filter(gender='M').count()
