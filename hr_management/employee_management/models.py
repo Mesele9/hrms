@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-
+from datetime import date
 class Department(models.Model):
     name = models.CharField(max_length=50)
 
@@ -52,6 +52,19 @@ class Document(models.Model):
     def __str__(self):
         return self.name
 
+
+class Attendance(models.Model):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    date = models.DateField()
+    status = models.CharField(max_length=2, choices=(('P', 'Present'), ('A', 'Absent'), ('AL', 'Annual Leave'), ('SL', 'Sick Leave'), ('OL', 'Other Leave')))
+
+    class Meta:
+        unique_together = ('employee', 'date')
+
+    def __str__(self):
+        return f"{self.employee} - {self.date} ({self.status})"
+
+
 class LeaveRequest(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     start_date = models.DateField()
@@ -60,4 +73,4 @@ class LeaveRequest(models.Model):
     status = models.CharField(max_length=20, choices=(('PENDING', 'Pending'), ('APPROVED', 'Approved'), ('REJECTED', 'Rejected')))
 
     def __str__(self):
-        return f"{self.employee.first_name} {self.employee.last_name} - {self.start_date} to {self.end_date}"
+        return f"{self.employee.first_name} {self.employee.last_name} - {self.start_date} to {self.end_date})"

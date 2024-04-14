@@ -1,11 +1,12 @@
 import re
+from django.contrib import messages
 from django.contrib.auth.decorators  import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Count
 from django.utils.timezone import now
 from datetime import timedelta, datetime
-from .models import Employee, Department, Position, Document, LeaveRequest
-from .forms import EmployeeForm, DepartmentForm, PositionForm, DocumentForm, LeaveRequestForm
+from .models import Employee, Department, Position, Document, Attendance, LeaveRequest
+from .forms import EmployeeForm, DepartmentForm, PositionForm, DocumentForm, AttendanceForm, LeaveRequestForm
 
 def home(request):
     # Retrieve total number of employees in each department
@@ -251,10 +252,70 @@ def document_delete(request, pk):
     document.delete()
     return redirect('hrms:document_list')
 
-
+@login_required
 def document_detail(request, pk):
     document = get_object_or_404(Document, pk=pk)
     return render(request, 'document_detail.html', {'document': document})
+
+
+@login_required
+def attendance_create(request):
+    if request.method == 'POST':
+        form = AttendanceForm(request.POST)
+        if form.is_valid():
+            attendance = form.save(commit=False)
+            attendance.employee = Employee.objects.get(pk=form.cleaned_data['employee'].id)
+            attendance.save()
+            messages.success(request, 'Attendance record created successfully.')
+            return redirect('hrms:attendance_list')
+    else:
+        form = AttendanceForm()
+
+    employees = Employee.objects.all().filter(is_active=True)
+
+    context = {
+        'form': form,
+        'employees': employees,
+    }
+
+    return render(request, 'attendance_form.html', context)
+
+
+def attendance_list(request):
+    attendances = Attendance.objects.all()
+
+    context = {
+        'attendances': attendances,
+    }
+
+    return render(request, 'attendance_list.html', context)
+
+
+def attendance_edit(request, pk):
+    attendance = get_object_or_404(Attendance, pk=pk)
+    if request.method == 'POST':
+        form = AttendanceForm(request.POST, instance=attendance)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Attendance record updated successfully.')
+            return redirect('hrms:attendance_list')
+    else:
+        form = AttendanceForm(instance=attendance)
+
+    context = {
+        'form': form,
+        'attendance': attendance,
+    }
+
+    return render(request, 'attendance_form.html', context)
+
+def attendance_delete(request, pk):
+    attendance = get_object_or_404(Attendance, pk=pk)
+    attendance.delete()
+    messages.success(request, 'Attendance record deleted successfully.')
+    return redirect('hrms:attendance_list')
+
+
 
 @login_required
 def leave_request_list(request):

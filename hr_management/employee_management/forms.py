@@ -1,5 +1,5 @@
 from django import forms
-from .models import Employee, Department, Position, Document, LeaveRequest
+from .models import Employee, Department, Position, Document, Attendance, LeaveRequest
 
 
 class DepartmentForm(forms.ModelForm):
@@ -30,6 +30,18 @@ class DocumentForm(forms.ModelForm):
             'file': forms.FileInput(attrs={'class': 'form-control-file'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
+
+
+class AttendanceForm(forms.ModelForm):
+    class Meta:
+        model = Attendance
+        fields = ('employee', 'date', 'status')
+        widgets = {
+            'employee': forms.Select(attrs={'class': 'form-control'}),
+            'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'status': forms.Select(attrs={'class': 'form-control'}),
+        }
+
 
 class LeaveRequestForm(forms.ModelForm):
     class Meta:

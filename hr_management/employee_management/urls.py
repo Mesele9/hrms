@@ -9,6 +9,7 @@ from .views import (
     position_list, position_create, position_update, position_delete, 
     document_list, document_create, document_update, document_delete, document_detail,
     leave_request_list, leave_request_create, leave_request_update, leave_request_delete,
+    attendance_create, attendance_list, attendance_edit, attendance_delete
 )
 
 app_name = 'hrms'
@@ -47,6 +48,12 @@ urlpatterns = [
     path('documents/delete/<int:pk>/', document_delete, name='document_delete'),
     #path('employees/detail/<int:pk>/', employee_detail_with_documents, name='employee_detail_with_documents'),
     path('documents/detail/<int:pk>/', document_detail, name='document_detail'),
+
+    # Attendance Management
+    path('attendance/create/', attendance_create, name='attendance_create'),
+    path('attendance/list/', attendance_list, name='attendance_list'),
+    path('attendance/edit/<int:pk>/', attendance_edit, name='attendance_edit'),
+    path('attendance/delete/<int:pk>/', attendance_delete, name='attendance_delete'),
 
     # Leave Management
     path('leave_requests/', leave_request_list, name='leave_request_list'),
