@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from datetime import date
+from .utils import document_upload_to
+
 class Department(models.Model):
     name = models.CharField(max_length=50)
 
@@ -36,15 +38,11 @@ class Employee(models.Model):
 
     def __str__(self):
         return f"{self.first_name} {self.middle_name} {self.last_name}"
-    
-    """  def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['picture'].widget.attrs.update({'class': 'form-control-file'}) """
 
 
 class Document(models.Model):
     name = models.CharField(max_length=100)
-    file = models.FileField(upload_to='documents/')
+    file = models.FileField(upload_to=document_upload_to)
     description = models.TextField(blank=True)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     date_uploaded = models.DateTimeField(auto_now_add=True)

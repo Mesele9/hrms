@@ -9,21 +9,7 @@ from .models import Employee, Department, Position, Document, Attendance, LeaveR
 from .forms import EmployeeForm, DepartmentForm, PositionForm, DocumentForm, AttendanceForm, LeaveRequestForm
 
 def home(request):
-    # Retrieve total number of employees in each department
-    """ departments = Department.objects.all()
-    department_data = {}
-    for department in departments:
-        department_data[department.name] = Employee.objects.filter(department=department).count()
-
-    # Retrieve total number of male and female employees
-    male_count = Employee.objects.filter(gender='M').count()
-    female_count = Employee.objects.filter(gender='F').count()
-
-    context = {
-        'department_data': department_data,
-        'male_count': male_count,
-        'female_count': female_count,
-    } """
+    
     return render(request, 'home.html')
 
 
@@ -32,8 +18,8 @@ def home(request):
 @login_required
 def dashboard(request):
     # Total number of employees
-    active_employees = Employee.objects.all().filter(is_active=True)
-    total_employees = Employee.objects.all().filter(is_active=True).count()
+    active_employees = Employee.objects.filter(is_active=True)
+    total_employees = Employee.objects.filter(is_active=True).count()
 
     # Employees by department
     department_data = active_employees.values('department__name').annotate(employee_count=Count('id'))
@@ -271,7 +257,7 @@ def attendance_create(request):
     else:
         form = AttendanceForm()
 
-    employees = Employee.objects.all().filter(is_active=True)
+    employees = Employee.objects.filter(is_active=True)
 
     context = {
         'form': form,
