@@ -1,13 +1,27 @@
-<!-- home.html -->
-
 {% extends 'base.html' %}
+
+{% block title %}HRMS - Home{% endblock %}
+
 {% block content %}
-    <h1>Welcome to HR Management System</h1>
-    {% if user.is_authenticated %}
-        <!-- Display authenticated user content -->
-        <p>Hello, {{ user.username }}!</p>
-    {% else %}
-        <!-- Display login prompt -->
-        <p>Please <a href="{% url 'hrms:login' %}">login</a> to view content.</p>
-    {% endif %}
+    <div class="row mt-5">
+        <div class="col-md-6 offset-md-3">
+            <div class="card">
+                <div class="card-header">
+                    {% if user.is_authenticated %}
+                        <h5>Welcome, {{ user.get_full_name }}!</h5>
+                    {% else %}
+                        <h5>Welcome to HRMS!</h5>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if user.is_authenticated %}
+                        <p>Explore the dashboard to view employee statistics and manage departments.</p>
+                        <a href="{% url 'hrms:dashboard' %}" class="btn btn-primary">Go to Dashboard</a>
+                    {% else %}
+                        <p>Please <a href="{% url 'hrms:login' %}">login</a> to access HRMS features.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

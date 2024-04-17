@@ -10,7 +10,7 @@ from .forms import EmployeeForm, DepartmentForm, PositionForm, DocumentForm, Att
 
 def home(request):
     
-    return render(request, 'home.html')
+    return render(request, 'home.html', {'user': request.user})
 
 
 
