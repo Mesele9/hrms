@@ -2,17 +2,28 @@ import re
 from django.contrib import messages
 from django.contrib.auth.decorators  import login_required
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import login as auth_login
 from django.db.models import Count
-from django.utils.timezone import now
-from datetime import timedelta, datetime
+from django.utils import timezone
+from datetime import timedelta, datetime, date
 from .models import Employee, Department, Position, Document, Attendance, LeaveRequest
 from .forms import EmployeeForm, DepartmentForm, PositionForm, DocumentForm, AttendanceForm, LeaveRequestForm
 
+
 def home(request):
-    
-    return render(request, 'home.html', {'user': request.user})
+    if request.user.is_authenticated:
+        # Get the user's full name
+        full_name = request.user.get_full_name() if request.user.get_full_name() else request.user.username
+        print(full_name)
+        # Get the current date in a formatted string
+        today_date = datetime.today().strftime("%B %d, %Y")
 
-
+        # Render the home template with user data and today's date
+        return render(request, 'home.html', {'user': request.user, 'today_date': today_date})
+    else:
+        # Render the home template without user data if not authenticated
+        return render(request, 'home.html', {'user': None})
 
 
 @login_required

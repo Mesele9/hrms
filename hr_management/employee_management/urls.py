@@ -20,6 +20,7 @@ urlpatterns = [
 
     path('', home, name='home'),
     path('dashboard', dashboard, name='dashboard'),
+    
     # Employee Management
     path('employees/', employee_list, name='employee_list'),
     path('employees/create/', employee_create, name='employee_create'),

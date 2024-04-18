@@ -141,5 +141,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = 'hrms:login'
 
-LOGIN_REDIRECT_URL = 'hrms:dashboard' # Redirect to home after login
+LOGIN_REDIRECT_URL = 'hrms:home' # Redirect to home after login
 LOGOUT_REDIRECT_URL = 'hrms:home' # Redirect to login after logout
