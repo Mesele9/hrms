@@ -1,76 +1,78 @@
 {% extends 'base.html' %}
-{% block title %}{{ employee.first_name }}{% endblock %}
+
+{% load static %}
+{% block title %}Employee Detail{% endblock %}
 
 {% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-dark text-light">
+                    Employee Profile
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            {% if employee.picture %}
+                                <img src="{{ employee.picture.url }}" alt="Employee Photo" class="img-fluid rounded-circle">
+                            {% else %}
+                                <img src="{% static 'images/no-profile.png' %}" alt="No Picture" class="img-fluid rounded-circle">
+                            {% endif %}
+                        </div>
+                        <div class="col-md-8">
+                            <h4>{{ employee.first_name }} {{ employee.last_name }}</h4>
+                            <p><strong>Gender:</strong> {{ employee.gende }}</p>
+                            <p><strong>Department:</strong> {{ employee.department }}</p>
+                            <p><strong>Position:</strong> {{ employee.position }}</p>
+                            <p><strong>Date of Birth:</strong> {{ employee.date_of_birth }}</p>
+                            <p><strong>Date of Hire:</strong> {{ employee.hire_date }}</p>
+                            <p><strong>Salary:</strong> {{ employee.salary }}</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h5>About {{ employee.first_name }}</h5>
+                            <p>{{ employee.bio }}</p>
+                        </div>
+                    </div>
 
- <div class="container">
-      <div class="col-md-9">
-        <div class="row mb-2">
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h5>Documents</h5>
+                            <div class="row">
+                                <a href="{% url 'hrms:document_create' employee_id=employee.pk %}">Upload New Document</a>
+                            </div>
 
-          {% if employee.picture %}
-            <img
-              src="{{ employee.picture.url }}"
-              class="float-left rounded-circle mr-3" style="width: 120px; height: 120px;">
-          {% else %}
-                No picture
-          {% endif %}
+                            {% if documents %}
+                                <ul>
+                                    {% for document in documents %}
+                                    <li>
+                                        <a href="{{ document.file.url }}" target="_blank">{{ document.name }}</a>
+                                        <p>Description: {{ document.description }}</p>
+                                        <p>Date Uploaded: {{ document.date_uploaded }}</p>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p>No documents associated with this employee.</p>
+                            {% endif %}
+                        </div>
+                    </div>
 
-            <h1>{{ employee.first_name }} {{ employee.middle_name }} {{ employee.last_name }}</h1>
+                </div>
+                <div class="card-footer text-muted text-center">
+                    {% if previous_employee %}
+                        <a href="{% url 'hrms:employee_detail' previous_employee.id %}" class="btn btn-secondary">Previous</a>
+                    {% endif %}
+                    {% if next_employee %}
+                        <a href="{% url 'hrms:employee_detail' next_employee.id %}" class="btn btn-secondary">Next</a>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-            <table class="table table-striped">
-            <tbody>
-                <tr>
-                    <th>Position:</th>
-                    <td>{{ employee.position }}</td>
-                </tr>
-                <tr>
-                    <th>Department:</th>
-                    <td>{{ employee.department }}</td>
-                </tr>
-                <tr>
-                    <th>Gender:</th>
-                    <td>{{ employee.get_gender_display}}</td>
-                </tr>
-                <tr>
-                    <th>Date of Birth:</th>
-                    <td>{{ employee.date_of_birth }}</td>
-                </tr>
-                <tr>
-                    <th>Hire Date:</th>
-                    <td>{{ employee.hire_date }}</td>
-                </tr>
-                <tr>
-                    <th>Salary:</th>
-                    <td>{{ employee.salary }}</td>
-                </tr>
-                <tr>
-                    <th>Active:</th>
-                    <td>{% if employee.is_active %}Yes{% else %}No{% endif %}</td>
-                </tr>
-            </tbody>
-        </table>
-
-
-        <div class="container">
-            <a href="{% url 'hrms:document_create' employee_id=employee.pk %}">Upload New Document</a>
-
-            {% if documents %}
-                <h3>Documents</h3>
-                <ul>
-                    {% for document in documents %}
-                        <li>
-                            <a href="{{ document.file.url }}" target="_blank">{{ document.name }}</a>
-                            <p>Description: {{ document.description }}</p>
-                            <p>Date Uploaded: {{ document.date_uploaded }}</p>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p>No documents uploaded for this employee.</p>
-            {% endif %}
-        </div>
-      </div>
- </div>
-
+    </div>
+</div>
 {% endblock %}
-

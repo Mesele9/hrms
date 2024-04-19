@@ -119,9 +119,10 @@ def employee_delete(request, pk):
 def employee_detail(request, pk):
     employee = get_object_or_404(Employee, pk=pk)
     documents = Document.objects.filter(employee=employee)
-    return render(request, 'employee_detail.html', {'employee': employee, 'documents': documents})
-    """employee = get_object_or_404(Employee, pk=pk)
-    return render(request, 'employee_detail.html', {'employee': employee})"""
+    next_employee = Employee.objects.filter(is_active=True, id__gt=pk).order_by('pk').first()  # Get the next employee
+    previous_employee = Employee.objects.filter(is_active=True, id__lt=employee.id).order_by('-pk').first() # Get the previous employee
+    context = {'employee': employee,'previous_employee': previous_employee, 'next_employee': next_employee, 'documents': documents}
+    return render(request, 'employee_detail.html', context)    
 
 
 @login_required

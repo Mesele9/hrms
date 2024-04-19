@@ -11,7 +11,9 @@
         <button type="submit">Search</button>
     </form>
 
-
+    <div class="container">
+    <a href="{% url 'hrms:document_create' employee_id=employee.pk %}">Upload New Document</a>
+    </div>
 
     <!-- Document Table -->
     <table class="table">
