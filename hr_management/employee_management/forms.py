@@ -25,11 +25,22 @@ class EmployeeForm(forms.ModelForm):
 class DocumentForm(forms.ModelForm):
     class Meta:
         model = Document
-        fields = ['name', 'file', 'description']
+        fields = ['name', 'file', 'description', 'employee']
         widgets = {
             'file': forms.FileInput(attrs={'class': 'form-control-file'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'employee': forms.Select(attrs={'class': 'form-control'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        include_employee_field = kwargs.pop('include_employee_field', True)
+        super().__init__(*args, **kwargs)
+
+        if not include_employee_field:
+            self.fields.pop('employee')  # Remove 'employee' field if not needed
+        else:
+            self.fields['employee'].queryset = Employee.objects.filter(is_active=True)
+
 
 
 class AttendanceForm(forms.ModelForm):

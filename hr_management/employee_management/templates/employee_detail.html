@@ -43,7 +43,7 @@
                         <div class="col-md-12">
                             <h5>Documents</h5>
                             <div class="row">
-                                <a href="{% url 'hrms:document_create' employee_id=employee.pk %}">Upload New Document</a>
+                                <a href="{% url 'hrms:document_create_employee' employee_id=employee.pk %}">Upload New Document</a>
                             </div>
 
                             {% if documents %}

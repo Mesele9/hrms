@@ -213,22 +213,14 @@ def document_list(request):
     return render(request, 'document_list.html', {'documents': documents, 'employee': employee})
 
 
-@login_required
-def document_create(request, employee_id):
-    employee = Employee.objects.get(pk=employee_id)
-
-    if request.method == 'POST':
-        form = DocumentForm(request.POST, request.FILES)
-        if form.is_valid():
-            document = form.save(commit=False)
-
-            document.employee_id = employee_id  # Associate the document with the employee
-            document.save()
-            return redirect('hrms:employee_detail', pk=employee_id)
+def document_create(request, employee_id=None):
+    if employee_id:
+        employee = Employee.objects.get(pk=employee_id)
+        # Creating a document from the employee detail page
+        return document_upload_form(request, include_employee_field=False, employee=employee)
     else:
-        form = DocumentForm()
-
-    return render(request, 'document_form.html', {'form': form, 'employee': employee})
+        # Creating a document from the document list page (require employee selection)
+        return document_upload_form(request, include_employee_field=True)
 
 
 @login_required
@@ -250,11 +242,54 @@ def document_delete(request, pk):
     document.delete()
     return redirect('hrms:document_list')
 
+
 @login_required
 def document_detail(request, pk):
     document = get_object_or_404(Document, pk=pk)
     return render(request, 'document_detail.html', {'document': document})
 
+
+@login_required
+def document_upload_form(request, include_employee_field=True, employee=None):
+    if request.method == 'POST':
+        form = DocumentForm(request.POST, request.FILES, include_employee_field=include_employee_field)
+        if form.is_valid():
+            form.save()
+            return redirect('hrms:document_list')
+    else:
+        form = DocumentForm(include_employee_field=include_employee_field)
+
+    if employee:
+        context = {
+            'employee': employee,
+            'form': form,
+        }
+    else:
+        context = {
+            'form': form,
+        }
+    return render(request, 'document_upload_form.html', context)
+
+
+""" @login_required
+def document_upload_form(request):
+    if request.method == 'POST':
+        form = DocumentForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('hrms:document_list')
+    else:
+        form = DocumentForm()
+
+    # Optionally, you can filter employees to display in the upload form
+    employees = Employee.objects.filter(is_active=True)
+
+    context = {
+        'form': form,
+        'employees': employees,
+    }
+    return render(request, 'document_upload_form.html', context)
+ """
 
 @login_required
 def attendance_create(request):

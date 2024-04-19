@@ -11,8 +11,9 @@
         <button type="submit">Search</button>
     </form>
 
-    <div class="container">
-    <a href="{% url 'hrms:document_create' employee_id=employee.pk %}">Upload New Document</a>
+    <!-- Upload Document Form and Button -->
+    <div class="mt-4 mb-4">
+        <a href="{% url 'hrms:document_upload_form' %}" class="btn btn-primary">Upload New Document</a>
     </div>
 
     <!-- Document Table -->
