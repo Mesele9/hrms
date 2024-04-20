@@ -44,6 +44,11 @@ class DocumentForm(forms.ModelForm):
 
 
 class AttendanceForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Filter employee choices to only include active employees
+        self.fields['employee'].queryset = Employee.objects.filter(is_active=True)
+
     class Meta:
         model = Attendance
         fields = ('employee', 'date', 'status')
@@ -54,6 +59,17 @@ class AttendanceForm(forms.ModelForm):
         }
 
 
+""" class AttendanceForm(forms.ModelForm):
+    class Meta:
+        model = Attendance
+        fields = ('employee', 'date', 'status')
+        widgets = {
+            'employee': forms.Select(attrs={'class': 'form-control'}),
+            'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'status': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+ """
 class LeaveRequestForm(forms.ModelForm):
     class Meta:
         model = LeaveRequest

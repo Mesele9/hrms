@@ -304,11 +304,10 @@ def attendance_create(request):
     else:
         form = AttendanceForm()
 
-    employees = Employee.objects.filter(is_active=True)
-
+    #employees = Employee.objects.filter(is_active=True)
+    
     context = {
         'form': form,
-        'employees': employees,
     }
 
     return render(request, 'attendance_form.html', context)
