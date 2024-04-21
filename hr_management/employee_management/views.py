@@ -2,13 +2,14 @@ import re
 from django.contrib import messages
 from django.contrib.auth.decorators  import login_required
 from django.shortcuts import render, redirect, get_object_or_404
+from django.db import IntegrityError
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login as auth_login
 from django.db.models import Count
 from django.utils import timezone
 from datetime import timedelta, datetime, date
 from .models import Employee, Department, Position, Document, Attendance, LeaveRequest
-from .forms import EmployeeForm, DepartmentForm, PositionForm, DocumentForm, AttendanceForm, LeaveRequestForm
+from .forms import EmployeeForm, DepartmentForm, PositionForm, DocumentForm, AttendanceBulkForm, AttendanceForm, EmployeeFilterForm, LeaveRequestForm
 
 
 def home(request):
@@ -271,25 +272,117 @@ def document_upload_form(request, include_employee_field=True, employee=None):
     return render(request, 'document_upload_form.html', context)
 
 
-""" @login_required
-def document_upload_form(request):
+def mark_attendance(request):
     if request.method == 'POST':
-        form = DocumentForm(request.POST, request.FILES)
+        form = AttendanceBulkForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('hrms:document_list')
-    else:
-        form = DocumentForm()
+            date = form.cleaned_data['date']
+            employees_ids = request.POST.getlist('employees')
+            status = form.cleaned_data['status']
+            
+            try:
+                attendance_records = []
+                for employee_id in employees_ids:
+                    employee = Employee.objects.get(id=employee_id)
+                    # Check if attendance record already exists for this employee and date
+                    attendance_record, created = Attendance.objects.update_or_create(
+                        employee=employee,
+                        date=date,
+                        defaults={'status': status}
+                    )
+                    attendance_records.append(attendance_record)
 
-    # Optionally, you can filter employees to display in the upload form
+                return redirect('hrms:mark_attendance')
+            
+            except IntegrityError:
+                # Handle integrity error due to unique constraint violation
+                # You might want to redirect with an error message or handle this differently
+                return redirect('hrms:mark_attendance')
+
+    else:
+        # Handle GET request to render the form
+        form = AttendanceBulkForm()
+        filter_form = EmployeeFilterForm(request.GET)
+        employees = Employee.objects.filter(is_active=True)
+
+        if filter_form.is_valid():
+            department = filter_form.cleaned_data['department']
+            search = filter_form.cleaned_data['search']
+
+            if department:
+                employees = employees.filter(department=department)
+            if search:
+                employees = employees.filter(first_name__icontains=search)
+
+        context = {
+            'form': form,
+            'filter_form': filter_form,
+            'employees': employees,
+        }
+        return render(request, 'mark_attendance.html', context)
+
+
+@login_required
+def attendance_summary(request):
+    filter_form = EmployeeFilterForm(request.GET)
     employees = Employee.objects.filter(is_active=True)
 
+    if filter_form.is_valid():
+        department = filter_form.cleaned_data['department']
+        search = filter_form.cleaned_data['search']
+
+        if department:
+            employees = employees.filter(department=department)
+        if search:
+            employees = employees.filter(first_name__icontains=search)
+
+    today = timezone.now().date()
+    thirty_days_ago = today - timedelta(days=30)
+
+    attendance_summary = {}
+    for employee in employees:
+        attendance_summary[employee.id] = {
+            'employee': employee,
+            'present': Attendance.objects.filter(employee=employee, status='present', date__gte=thirty_days_ago).count(),
+            'absent': Attendance.objects.filter(employee=employee, status='absent', date__gte=thirty_days_ago).count(),
+            'annual_leave': Attendance.objects.filter(employee=employee, status='annual_leave', date__gte=thirty_days_ago).count(),
+            'sick_leave': Attendance.objects.filter(employee=employee, status='sick_leave', date__gte=thirty_days_ago).count(),
+            'other_leave': Attendance.objects.filter(employee=employee, status='other_leave', date__gte=thirty_days_ago).count(),
+        }
+
     context = {
-        'form': form,
-        'employees': employees,
+        'filter_form': filter_form,
+        'attendance_summary': attendance_summary,
     }
-    return render(request, 'document_upload_form.html', context)
- """
+
+    return render(request, 'attendance_summary.html', context)
+
+"""def attendance_summary(request):
+    if request.method == 'GET':
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
+
+        if start_date and end_date:
+            # Assuming date format is YYYY-MM-DD, you may need to parse and validate the dates
+            start_date = timezone.make_aware(timezone.datetime.strptime(start_date, '%Y-%m-%d'))
+            end_date = timezone.make_aware(timezone.datetime.strptime(end_date, '%Y-%m-%d'))
+
+            # Retrieve attendance records within the specified date range
+            attendance_records = Attendance.objects.filter(date__range=(start_date, end_date))
+        else:
+            # Retrieve all attendance records if no date range is specified
+            attendance_records = Attendance.objects.all()
+
+        context = {
+            'attendance_records': attendance_records,
+            'start_date': start_date,
+            'end_date': end_date,
+        }
+        return render(request, 'attendance_summary.html', context)
+    else:
+        # Handle POST requests if needed
+        pass
+"""
 
 @login_required
 def attendance_create(request):

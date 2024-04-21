@@ -51,7 +51,7 @@ class Document(models.Model):
         return self.name
 
 
-class Attendance(models.Model):
+""" class Attendance2(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     date = models.DateField()
     status = models.CharField(max_length=2, choices=(('P', 'Present'), ('A', 'Absent'), ('AL', 'Annual Leave'), ('SL', 'Sick Leave'), ('OL', 'Other Leave')))
@@ -61,7 +61,30 @@ class Attendance(models.Model):
 
     def __str__(self):
         return f"{self.employee} - {self.date} ({self.status})"
+ """
 
+
+class Attendance(models.Model):
+    STATUS_CHOICES = [
+        ('present', 'Present'),
+        ('absent', 'Absent'),
+        ('annual_leave', 'Annual Leave'),
+        ('sick_leave', 'Sick Leave'),
+        ('other_leave', 'Other Leave')
+    ]
+
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    date = models.DateField()
+    status = models.CharField(max_length=15, choices=STATUS_CHOICES)
+    marked_by = models.ForeignKey(User, related_name='marked_attendance', on_delete=models.SET_NULL, null=True, blank=True)
+    marked_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('employee', 'date',)
+
+    def __str__(self):
+        return f"{self.employee} - {self.date} - {self.get_status_display()}"
+    
 
 class LeaveRequest(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)

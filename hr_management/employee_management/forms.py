@@ -1,4 +1,5 @@
 from django import forms
+from django.forms import inlineformset_factory
 from .models import Employee, Department, Position, Document, Attendance, LeaveRequest
 
 
@@ -42,34 +43,25 @@ class DocumentForm(forms.ModelForm):
             self.fields['employee'].queryset = Employee.objects.filter(is_active=True)
 
 
-
 class AttendanceForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Filter employee choices to only include active employees
-        self.fields['employee'].queryset = Employee.objects.filter(is_active=True)
-
     class Meta:
         model = Attendance
-        fields = ('employee', 'date', 'status')
+        fields = ['date']
         widgets = {
-            'employee': forms.Select(attrs={'class': 'form-control'}),
             'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-            'status': forms.Select(attrs={'class': 'form-control'}),
         }
+    
+
+class AttendanceBulkForm(forms.Form):
+    date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}))
+    employees = forms.ModelMultipleChoiceField(queryset=Employee.objects.filter(is_active=True), widget=forms.CheckboxSelectMultiple)
+    status = forms.ChoiceField(choices=Attendance.STATUS_CHOICES, widget=forms.RadioSelect)
+
+class EmployeeFilterForm(forms.Form):
+    department = forms.ModelChoiceField(queryset=Department.objects.all(), required=False)
+    search = forms.CharField(required=False)
 
 
-""" class AttendanceForm(forms.ModelForm):
-    class Meta:
-        model = Attendance
-        fields = ('employee', 'date', 'status')
-        widgets = {
-            'employee': forms.Select(attrs={'class': 'form-control'}),
-            'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-            'status': forms.Select(attrs={'class': 'form-control'}),
-        }
-
- """
 class LeaveRequestForm(forms.ModelForm):
     class Meta:
         model = LeaveRequest
