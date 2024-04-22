@@ -13,15 +13,23 @@ class PositionForm(forms.ModelForm):
         model = Position
         fields = ['name']
 
+
 class EmployeeForm(forms.ModelForm):
     class Meta:
         model = Employee
-        fields = ['first_name', 'middle_name', 'last_name', 'gender', 'email', 'department', 'position', 'date_of_birth', 'hire_date', 'salary', 'is_active', 'picture']
+        fields = ['first_name', 'middle_name', 'last_name', 'gender', 'mobile',
+                  'email', 'department', 'position', 'date_of_birth', 'hire_date',
+                  'salary', 'education_level', 'address', 'pension_number',
+                  'emergency_contact_name', 'emergency_contact_phone',
+                  'is_coc_certified', 'is_active', 'picture']
         widgets = {
+            'gender': forms.RadioSelect(),
             'date_of_birth': forms.DateInput(attrs={'type': 'date'}),
             'hire_date': forms.DateInput(attrs={'type': 'date'}),
+            'address': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
             'picture': forms.FileInput(attrs={'class': 'form-control'}),
         }
+
 
 class DocumentForm(forms.ModelForm):
     class Meta:

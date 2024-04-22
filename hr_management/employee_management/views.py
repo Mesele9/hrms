@@ -106,7 +106,7 @@ def employee_update(request, pk):
             return redirect('hrms:employee_list')
     else:
         form = EmployeeForm(instance=employee)
-    return render(request, 'employee_form.html', {'form': form})
+    return render(request, 'employee_form.html', {'form': form, 'employee':employee})
 
 
 @login_required
@@ -357,32 +357,6 @@ def attendance_summary(request):
 
     return render(request, 'attendance_summary.html', context)
 
-"""def attendance_summary(request):
-    if request.method == 'GET':
-        start_date = request.GET.get('start_date')
-        end_date = request.GET.get('end_date')
-
-        if start_date and end_date:
-            # Assuming date format is YYYY-MM-DD, you may need to parse and validate the dates
-            start_date = timezone.make_aware(timezone.datetime.strptime(start_date, '%Y-%m-%d'))
-            end_date = timezone.make_aware(timezone.datetime.strptime(end_date, '%Y-%m-%d'))
-
-            # Retrieve attendance records within the specified date range
-            attendance_records = Attendance.objects.filter(date__range=(start_date, end_date))
-        else:
-            # Retrieve all attendance records if no date range is specified
-            attendance_records = Attendance.objects.all()
-
-        context = {
-            'attendance_records': attendance_records,
-            'start_date': start_date,
-            'end_date': end_date,
-        }
-        return render(request, 'attendance_summary.html', context)
-    else:
-        # Handle POST requests if needed
-        pass
-"""
 
 @login_required
 def attendance_create(request):

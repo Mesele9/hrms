@@ -15,6 +15,7 @@ class Position(models.Model):
     def __str__(self):
         return self.name
 
+
 class Employee(models.Model):
 
     GENDER_CHOICES = (
@@ -22,22 +23,35 @@ class Employee(models.Model):
         ('F', 'Female'),
     )
 
-    #user = models.OneToOneField(User, on_delete=models.CASCADE)
+    EDUCATION_LEVEL_CHOICES = (
+        ('Master', 'Master\'s Degree'),
+        ('Degree', 'Bachelor\'s Degree'),
+        ('Diploma', 'Diploma'),
+        ('Certificate', 'Certificate'),
+    )
+
     first_name = models.CharField(max_length=50)
     middle_name = models.CharField(max_length=50, null=True, blank=True)
     last_name = models.CharField(max_length=50, null=True, blank=True)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, default="")
-    email = models.EmailField()
+    mobile = models.CharField(max_length=15, null=True, blank=True)
+    email = models.EmailField(null=True, blank=True)
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
     position = models.ForeignKey(Position, on_delete=models.CASCADE)
     date_of_birth = models.DateField()
     hire_date = models.DateField()
     salary = models.DecimalField(max_digits=10, decimal_places=2)
+    education_level = models.CharField(max_length=20, choices=EDUCATION_LEVEL_CHOICES, null=True, blank=True)
+    address = models.TextField(null=True, blank=True)
+    pension_number = models.CharField(max_length=20, null=True, blank=True)
+    emergency_contact_name = models.CharField(max_length=100, null=True, blank=True)
+    emergency_contact_phone = models.CharField(max_length=15, null=True, blank=True)
+    is_coc_certified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     picture = models.ImageField(upload_to='employee_pictures/', null=True, blank=True)
 
     def __str__(self):
-        return f"{self.first_name} {self.middle_name} {self.last_name}"
+        return f"{self.first_name} {self.middle_name} {self.mobile}"
 
 
 class Document(models.Model):
@@ -50,18 +64,6 @@ class Document(models.Model):
     def __str__(self):
         return self.name
 
-
-""" class Attendance2(models.Model):
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    date = models.DateField()
-    status = models.CharField(max_length=2, choices=(('P', 'Present'), ('A', 'Absent'), ('AL', 'Annual Leave'), ('SL', 'Sick Leave'), ('OL', 'Other Leave')))
-
-    class Meta:
-        unique_together = ('employee', 'date')
-
-    def __str__(self):
-        return f"{self.employee} - {self.date} ({self.status})"
- """
 
 
 class Attendance(models.Model):

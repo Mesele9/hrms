@@ -1,7 +1,10 @@
 {% extends 'base.html' %}
 
 {% load static %}
-{% block title %}Employee Detail{% endblock %}
+
+{% block title %}
+    Employee Detail: {{ employee.first_name }} {{ employee.last_name }}
+{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
@@ -21,13 +24,22 @@
                             {% endif %}
                         </div>
                         <div class="col-md-8">
-                            <h4>{{ employee.first_name }} {{ employee.last_name }}</h4>
-                            <p><strong>Gender:</strong> {{ employee.gende }}</p>
-                            <p><strong>Department:</strong> {{ employee.department }}</p>
-                            <p><strong>Position:</strong> {{ employee.position }}</p>
+                            <h4>{{ employee.first_name }} {{ employee.middle_name }} {{ employee.last_name }}</h4>
+                            <p><strong>Gender:</strong> {{ employee.get_gender_display }}</p>
+                            <p><strong>Department:</strong> {{ employee.department.name }}</p>
+                            <p><strong>Position:</strong> {{ employee.position.name }}</p>
                             <p><strong>Date of Birth:</strong> {{ employee.date_of_birth }}</p>
                             <p><strong>Date of Hire:</strong> {{ employee.hire_date }}</p>
                             <p><strong>Salary:</strong> {{ employee.salary }}</p>
+                            <p><strong>Education Level:</strong> {{ employee.education_level }}</p>
+                            <p><strong>Email:</strong> {{ employee.email }}</p>
+                            <p><strong>Mobile:</strong> {{ employee.mobile }}</p>
+                            <p><strong>Address:</strong> {{ employee.address }}</p>
+                            <p><strong>Pension Number:</strong> {{ employee.pension_number }}</p>
+                            <p><strong>Emergency Contact Name:</strong> {{ employee.emergency_contact_name }}</p>
+                            <p><strong>Emergency Contact Phone:</strong> {{ employee.emergency_contact_phone }}</p>
+                            <p><strong>COC Certified:</strong> {% if employee.is_coc_certified %}Yes{% else %}No{% endif %}</p>
+                            <p><strong>Active:</strong> {% if employee.is_active %}Yes{% else %}No{% endif %}</p>
                         </div>
                     </div>
                     <hr>
@@ -37,13 +49,12 @@
                             <p>{{ employee.bio }}</p>
                         </div>
                     </div>
-
                     <hr>
                     <div class="row">
                         <div class="col-md-12">
                             <h5>Documents</h5>
                             <div class="row">
-                                <a href="{% url 'hrms:document_create_employee' employee_id=employee.pk %}">Upload New Document</a>
+                                <a href="{% url 'hrms:document_create_employee' employee_id=employee.pk %}" class="btn btn-primary">Upload New Document</a>
                             </div>
 
                             {% if documents %}
@@ -61,7 +72,6 @@
                             {% endif %}
                         </div>
                     </div>
-
                 </div>
                 <div class="card-footer text-muted text-center">
                     {% if previous_employee %}
