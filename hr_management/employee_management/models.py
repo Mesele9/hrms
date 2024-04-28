@@ -9,6 +9,7 @@ class Department(models.Model):
     def __str__(self):
         return self.name
 
+
 class Position(models.Model):
     name = models.CharField(max_length=50, unique=True)
 
@@ -78,36 +79,3 @@ class Document(models.Model):
     def __str__(self):
         return self.name
 
-
-
-class Attendance(models.Model):
-    STATUS_CHOICES = [
-        ('present', 'Present'),
-        ('absent', 'Absent'),
-        ('annual_leave', 'Annual Leave'),
-        ('sick_leave', 'Sick Leave'),
-        ('other_leave', 'Other Leave')
-    ]
-
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    date = models.DateField()
-    status = models.CharField(max_length=15, choices=STATUS_CHOICES)
-    marked_by = models.ForeignKey(User, related_name='marked_attendance', on_delete=models.SET_NULL, null=True, blank=True)
-    marked_date = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        unique_together = ('employee', 'date',)
-
-    def __str__(self):
-        return f"{self.employee} - {self.date} - {self.get_status_display()}"
-    
-
-class LeaveRequest(models.Model):
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    start_date = models.DateField()
-    end_date = models.DateField()
-    reason = models.TextField()
-    status = models.CharField(max_length=20, choices=(('PENDING', 'Pending'), ('APPROVED', 'Approved'), ('REJECTED', 'Rejected')))
-
-    def __str__(self):
-        return f"{self.employee.first_name} {self.employee.last_name} - {self.start_date} to {self.end_date})"

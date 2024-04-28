@@ -7,9 +7,8 @@ from .views import (
     home, dashboard, employee_list, employee_create, employee_update, employee_delete, employee_detail,
     department_list, department_create, department_update, department_delete,
     position_list, position_create, position_update, position_delete, 
-    document_list, document_create, document_update, document_delete, document_detail, document_upload_form,
-    leave_request_list, leave_request_create, leave_request_update, leave_request_delete,
-    attendance_create, attendance_list, attendance_edit, attendance_delete, mark_attendance, attendance_summary
+    document_list, document_create, document_update, document_delete, document_upload_form,
+    
 )
 
 app_name = 'hrms'
@@ -33,38 +32,19 @@ urlpatterns = [
     path('departments/create/', department_create, name='department_create'),
     path('departments/update/<int:pk>/', department_update, name='department_update'),
     path('departments/delete/<int:pk>/', department_delete, name='department_delete'),
-    #path('departments/detail/<int:pk>/', department_detail, name='department_detail'),
 
     # Position Management
     path('positions/', position_list, name='position_list'),
     path('positions/create/', position_create, name='position_create'),
     path('positions/update/<int:pk>/', position_update, name='position_update'),
     path('positions/delete/<int:pk>/', position_delete, name='position_delete'),
-    #path('positions/detail/<int:pk>/', position_detail, name='position_detail'),
 
     # Document Management
     path('documents/', document_list, name='document_list'),
     path('documents/create/', document_create, name='document_create'),
     path('documents/create/<int:employee_id>/', document_create, name='document_create_employee'),
-    #path('documents/create/<int:employee_id>/', document_create, name='document_create'),
     path('documents/update/<int:pk>/', document_update, name='document_update'),
     path('documents/delete/<int:pk>/', document_delete, name='document_delete'),
-    path('documents/detail/<int:pk>/', document_detail, name='document_detail'),
     path('documents/upload/', document_upload_form, name='document_upload_form'),
 
-    # Attendance Management
-    path('attendance/create/', attendance_create, name='attendance_create'),
-    path('attendance/list/', attendance_list, name='attendance_list'),
-    path('attendance/edit/<int:pk>/', attendance_edit, name='attendance_edit'),
-    path('attendance/delete/<int:pk>/', attendance_delete, name='attendance_delete'),
-
-    path('attendance/mark/', mark_attendance, name='mark_attendance'),
-    path('attendance/summary/', attendance_summary, name='attendance_summary'),
-
-    # Leave Management
-    path('leave_requests/', leave_request_list, name='leave_request_list'),
-    path('leave_requests/create/', leave_request_create, name='leave_request_create'),
-    path('leave_requests/update/<int:pk>/', leave_request_update, name='leave_request_update'),
-    path('leave_requests/delete/<int:pk>/', leave_request_delete, name='leave_request_delete'),
-    #path('leave_requests/detail/<int:pk>/', leave_request_detail, name='leave_request_detail'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
