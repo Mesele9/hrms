@@ -66,6 +66,49 @@ def employee_list(request):
     active_employees = all_employees.filter(is_active=True)
     inactive_employees = all_employees.filter(is_active=False)
     departments = Department.objects.all()
+
+    status_filter = request.GET.get('status', 'active')
+    if status_filter == 'inactive':
+        employees = inactive_employees
+    elif status_filter == 'all':
+        employees = all_employees
+    else:
+        employees = active_employees
+
+    # Search functionality
+    search_query = request.GET.get('q')
+    if search_query:
+        employees = employees.filter(first_name__icontains=search_query)
+
+    # Department filter
+    department_filter = request.GET.get('department')
+    if department_filter:
+        employees = employees.filter(department_id=department_filter)
+
+    paginator = Paginator(employees, 10)  # Show 10 employees per page
+    page_number = request.GET.get('page')
+    try:
+        page_obj = paginator.get_page(page_number)
+    except PageNotAnInteger:
+        page_obj = paginator.get_page(1)
+    except EmptyPage:
+        page_obj = paginator.get_page(paginator.num_pages)
+
+    context = {
+        'employees': page_obj,
+        'departments': departments,
+        'status_filter': status_filter,
+        'search_query': search_query,
+        'department_filter': department_filter,
+        'is_paginated': True,
+    }
+
+    return render(request, 'employee_list.html', context)
+
+    all_employees = Employee.objects.all()
+    active_employees = all_employees.filter(is_active=True)
+    inactive_employees = all_employees.filter(is_active=False)
+    departments = Department.objects.all()
     
     status_filter = request.GET.get('status', 'active')
     if status_filter == 'inactive':
