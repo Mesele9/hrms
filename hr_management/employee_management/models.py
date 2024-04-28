@@ -52,7 +52,7 @@ class Employee(models.Model):
     picture = models.ImageField(upload_to='employee_pictures/', null=True, blank=True)
 
     def __str__(self):
-        return f"{self.first_name} {self.middle_name} {self.mobile}"
+        return f"{self.first_name} {self.middle_name}"
 
 
 class Document(models.Model):

@@ -234,7 +234,7 @@ def document_update(request, pk):
             return redirect('hrms:document_list')
     else:
         form = DocumentForm(instance=document)
-    return render(request, 'document_form.html', {'form': form})
+    return render(request, 'document_upload_form.html', {'form': form})
 
 
 @login_required

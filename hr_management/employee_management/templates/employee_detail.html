@@ -91,7 +91,7 @@
                             <h5>Documents</h5>
                             <div class="row mb-3">
                                 <div class="col-md-12">
-                                    <a href="{% url 'hrms:document_create_employee' employee_id=employee.pk %}" class="btn btn-primary">Upload New Document</a>
+                                    <a href="{% url 'hrms:document_create_employee' employee_id=employee.pk %}" class="btn btn-outline-primary">Upload New Document</a>
                                 </div>
                             </div>
                             {% if documents %}
@@ -112,10 +112,10 @@
                 </div>
                 <div class="card-footer text-muted text-center">
                     {% if previous_employee %}
-                        <a href="{% url 'hrms:employee_detail' previous_employee.id %}" class="btn btn-secondary">Previous</a>
+                        <a href="{% url 'hrms:employee_detail' previous_employee.id %}" class="btn btn-outline-secondary"><</a>
                     {% endif %}
                     {% if next_employee %}
-                        <a href="{% url 'hrms:employee_detail' next_employee.id %}" class="btn btn-secondary">Next</a>
+                        <a href="{% url 'hrms:employee_detail' next_employee.id %}" class="btn btn-outline-secondary">></a>
                     {% endif %}
                 </div>
             </div>

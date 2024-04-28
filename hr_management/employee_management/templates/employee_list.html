@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-3">
-            <a href="{% url 'hrms:employee_create' %}" class="btn btn-primary mb-3">Add Employee</a>
+            <a href="{% url 'hrms:employee_create' %}" class="btn btn-outline-primary mb-3">Add Employee</a>
         </div>
         
         <div class="col-md-9">
@@ -32,7 +32,7 @@
                 <h2>Employee Lists</h2>
             </div>
             <div class="btn-group">
-                <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="background-color: #007bff; color: white;">
+                <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="background-color: #007bff; color: white;">
                     Employee Status
                 </button>
                 <div class="dropdown-menu" style="background-color: #007bff; color: white;">
@@ -71,8 +71,8 @@
                         
                     </td>{% endif %} -->
                     <td>
-                        <a href="{% url 'hrms:employee_update' employee.pk %}" class="btn btn-primary btn-sm">Edit</a>
-                        <a href="{% url 'hrms:employee_delete' employee.pk %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this employee?')">Delete</a>
+                        <a href="{% url 'hrms:employee_update' employee.pk %}" class="btn btn-outline-primary btn-sm">Edit</a>
+                        <a href="{% url 'hrms:employee_delete' employee.pk %}" class="btn btn-outline-danger btn-sm" onclick="return confirm('Are you sure you want to delete this employee?')">Delete</a>
                     </td>
                 </tr>
 

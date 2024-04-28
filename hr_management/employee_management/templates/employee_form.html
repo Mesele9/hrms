@@ -130,8 +130,9 @@
                 </div>
             </div>
         </div>
-        <button type="submit" class="btn btn-primary">{% if employee %}Save Changes{% else %}Register Employee{% endif %}</button>
-        <a href="{% url 'hrms:employee_list' %}" class="btn btn-secondary ml-2">Cancel</a>
+        <hr>
+        <button type="submit" class="btn btn-outline-primary">{% if employee %}Save Changes{% else %}Register Employee{% endif %}</button>
+        <a href="{% url 'hrms:employee_list' %}" class="btn btn-outline-secondary ml-2">Cancel</a>
     </form>
 </div>
 {% endblock %}

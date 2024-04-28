@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="container">
-    <h2>Document List</h2>
+    <h3>Document List</h3>
 
     <!-- Search Form -->
     <form method="GET" action="{% url 'hrms:document_list' %}">
@@ -13,11 +13,11 @@
 
     <!-- Upload Document Form and Button -->
     <div class="mt-4 mb-4">
-        <a href="{% url 'hrms:document_upload_form' %}" class="btn btn-primary">Upload New Document</a>
+        <a href="{% url 'hrms:document_upload_form' %}" class="btn btn-outline-primary">Upload Document</a>
     </div>
 
     <!-- Document Table -->
-    <table class="table">
+    <table class="table table-striped">
         <thead>
             <tr>
                 <th>Name</th>
@@ -29,12 +29,12 @@
         <tbody>
             {% for document in documents %}
                 <tr>
-                    <td>{{ document.name }}</td>
+                    <td>{{ document.get_name_display }}</td>
                     <td>{{ document.employee }}</td>
                     <td>{{ document.date_uploaded }}</td>
                     <td>
-                        <a href="{% url 'hrms:document_update' document.pk %}" class="btn btn-sm btn-info">Edit</a>
-                        <button class="btn btn-sm btn-danger" onclick="confirmDelete('{{ document.name }}', '{{ document.pk }}')">Delete</button>
+                        <a href="{% url 'hrms:document_update' document.pk %}" class="btn btn-sm btn-outline-primary">Edit</a>
+                        <button class="btn btn-sm btn-outline-danger" onclick="confirmDelete('{{ document.name }}', '{{ document.pk }}')">Delete</button>
                     </td>
                 </tr>
             {% empty %}

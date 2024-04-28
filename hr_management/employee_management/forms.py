@@ -28,12 +28,14 @@ class EmployeeForm(forms.ModelForm):
             'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Last Name'}),
             'mobile': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Mobile No'}),
             'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'}),
-            #'department': forms.ChoiceField(attrs={'class': 'form-control'}),
-            #'position': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Position'}),
+            'salary': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Basic Salary'}),
+            #'address': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Address'}),
+            'emergency_contact_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Emergency Contact Name'}),
+            'emergency_contact_phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Emergency Contact Phone'}),
             'gender': forms.RadioSelect(),
             'date_of_birth': forms.DateInput(attrs={'type': 'date'}),
             'hire_date': forms.DateInput(attrs={'type': 'date'}),
-            'address': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
+            'address': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Employee Address', 'rows': 2}),
             'picture': forms.FileInput(attrs={'class': 'form-control'}),
         }
 
