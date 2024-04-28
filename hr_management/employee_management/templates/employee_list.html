@@ -32,10 +32,10 @@
                 <h2>Employee Lists</h2>
             </div>
             <div class="btn-group">
-                <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Employee Status
                 </button>
-                <div class="dropdown-menu" style="background-color: #007bff; color: white;">
+                <div class="dropdown-menu" style="background-color: #159b3d; color: white;">
                     <a class="dropdown-item" href="{% url 'hrms:employee_list' %}">Active</a>
                     <a class="dropdown-item" href="{% url 'hrms:employee_list' %}?status=inactive">Inactive</a>
                     <a class="dropdown-item" href="{% url 'hrms:employee_list' %}?status=all">All</a>
@@ -71,7 +71,7 @@
                         
                     </td>{% endif %} -->
                     <td>
-                        <a href="{% url 'hrms:employee_update' employee.pk %}" class="btn btn-outline-primary btn-sm" style="margin-right: 10px;">Edit</a>
+                        <a href="{% url 'hrms:employee_update' employee.pk %}" class="btn btn-outline-dark btn-sm" style="margin-right: 10px;">Edit</a>
                     </td>
                 </tr>
 
