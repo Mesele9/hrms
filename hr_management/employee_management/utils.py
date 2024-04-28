@@ -12,10 +12,11 @@ def document_upload_to(instance, file_name):
   """
   # Ensure employee object is available
   if not instance.employee:
-      raise ValueError("Employee object is not set for the Document instance.")
+    raise ValueError("Employee object is not set for the Document instance.")
 
   # Create a slugified version of the file name (optional for better URL compatibility)
   file_name = slugify(instance.file.name)
 
   # Construct the upload path using employee ID and slugified file name
   return f'documents/{instance.employee.id}/{file_name}'
+

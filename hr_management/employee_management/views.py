@@ -255,7 +255,10 @@ def document_upload_form(request, include_employee_field=True, employee=None):
     if request.method == 'POST':
         form = DocumentForm(request.POST, request.FILES, include_employee_field=include_employee_field)
         if form.is_valid():
-            form.save()
+            document = form.save(commit=False)
+            if employee:
+                document.employee = employee
+            document.save()
             return redirect('hrms:document_list')
     else:
         form = DocumentForm(include_employee_field=include_employee_field)

@@ -15,6 +15,11 @@
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit" class="btn btn-primary">Upload</button>
+        {% if employee %}
+            <a href="{% url 'hrms:employee_list' %}" class="btn btn-secondary ml-2">Cancel</a>
+        {% else %}
+            <a href="{% url 'hrms:document_list' %}" class="btn btn-secondary ml-2">Cancel</a>
+        {% endif %}
     </form>
 </div>
 {% endblock %}
