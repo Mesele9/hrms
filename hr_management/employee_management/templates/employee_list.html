@@ -8,9 +8,9 @@
         </div>
         
         <div class="col-md-9">
-            <form class="d-flex">
-                <input class="form-control me-2" type="search" placeholder="Search by name" aria-label="Search" id="search-input">
-                <button class="btn btn-outline-success" type="button" onclick="searchEmployees()">Search</button>
+            <form class="d-flex" method="GET" action="{% url 'hrms:employee_list' %}">
+                <input class="form-control me-2" type="search" placeholder="Search by name" aria-label="Search" name="q" value="{{ request.GET.q }}">
+                <button class="btn btn-outline-success" type="submit">Search</button>
             </form>
         </div>
 
@@ -18,30 +18,32 @@
     <div class="row">
         <div class="col-md-12">
             <label for="department-filter">Filter by Department:</label>
-            <select class="form-select mb-3" id="department-filter" onchange="filterEmployeesByDepartment()">
-                <option value="">All Departments</option>
-                {% for department in departments %}
-                    <option value="{{ department.id }}">{{ department.name }}</option>
-                {% endfor %}
-            </select>
+            <form method="GET" action="{% url 'hrms:employee_list' %}" id="department-filter-form">
+                <select class="form-select mb-3" id="department-filter" name="department">
+                    <option value="">All Departments</option>
+                    {% for department in departments %}
+                        <option value="{{ department.id }}" {% if department.id == selected_department %}selected{% endif %}>{{ department.name }}</option>
+                    {% endfor %}
+                </select>
+            </form>
         </div>
     </div>
 
     <div class="col-md-12 d-flex justify-content-between align-items-center">
-            <div class="col-md-9 text-center">
-                <h2>Employee Lists</h2>
-            </div>
-            <div class="btn-group">
-                <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Employee Status
-                </button>
-                <div class="dropdown-menu" style="background-color: #159b3d; color: white;">
-                    <a class="dropdown-item" href="{% url 'hrms:employee_list' %}">Active</a>
-                    <a class="dropdown-item" href="{% url 'hrms:employee_list' %}?status=inactive">Inactive</a>
-                    <a class="dropdown-item" href="{% url 'hrms:employee_list' %}?status=all">All</a>
-                </div>
+        <div class="col-md-9 text-center">
+            <h2>Employee Lists</h2>
+        </div>
+        <div class="btn-group">
+            <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Employee Status
+            </button>
+            <div class="dropdown-menu" style="background-color: #159b3d; color: white;">
+                <a class="dropdown-item" href="{% url 'hrms:employee_list' %}">Active</a>
+                <a class="dropdown-item" href="{% url 'hrms:employee_list' %}?status=inactive">Inactive</a>
+                <a class="dropdown-item" href="{% url 'hrms:employee_list' %}?status=all">All</a>
             </div>
         </div>
+    </div>
 
     <div class="col-md-12">
         <table class="table table-striped">
@@ -51,70 +53,55 @@
                     <th>Position</th>
                     <th>Department</th>
                     <th>Date of Birth</th>
-                    <!-- <th>Picture</th> -->
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody id="employee-table-body">
                 {% for employee in employees %}
-
                 <tr data-department-id="{{ employee.department.id }}">
                     <td><a href="{% url 'hrms:employee_detail' employee.pk %}">{{ employee.first_name }} {{ employee.middle_name }}</a></td>
                     <td>{{ employee.position }}</td>
                     <td>{{ employee.department.name }}</td>
                     <td>{{ employee.date_of_birth }}</td>
-                    <!--<td>
-                         {% if employee.picture %}
-                            <img src="{{ employee.picture.url }}" alt="Employee Picture" width="50" class="img-fluid round-circle">
-                        {% else %}
-                            No Picture
-                        
-                    </td>{% endif %} -->
                     <td>
                         <a href="{% url 'hrms:employee_update' employee.pk %}" class="btn btn-outline-dark btn-sm" style="margin-right: 10px;">Edit</a>
                     </td>
                 </tr>
-
                 {% endfor %}
             </tbody>
         </table>
+        {% if is_paginated %}
+        <ul class="pagination">
+            {% if employees.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ employees.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.department %}&department={{ request.GET.department }}{% endif %}">Previous</a>
+            </li>
+            {% endif %}
+            {% for num in employees.paginator.page_range %}
+            {% if employees.number == num %}
+            <li class="page-item active" aria-current="page">
+                <span class="page-link">{{ num }}</span>
+            </li>
+            {% else %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.department %}&department={{ request.GET.department }}{% endif %}">{{ num }}</a>
+            </li>
+            {% endif %}
+            {% endfor %}
+            {% if employees.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ employees.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.department %}&department={{ request.GET.department }}{% endif %}">Next</a>
+            </li>
+            {% endif %}
+        </ul>
+        {% endif %}
     </div>
 </div>
 
 <script>
-    function searchEmployees() {
-        const searchInput = document.getElementById('search-input');
-        const searchTerm = searchInput.value.toLowerCase();
-        const employeeRows = document.querySelectorAll('#employee-table-body tr');
-
-        employeeRows.forEach(row => {
-            const nameCell = row.cells[0];
-            const name = nameCell.innerText.toLowerCase();
-
-            if (name.includes(searchTerm)) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
-        });
-    }
-
-    function filterEmployeesByDepartment() {
-        const selectedDepartmentId = document.getElementById('department-filter').value;
-        const employeeRows = document.querySelectorAll('#employee-table-body tr');
-
-        employeeRows.forEach(row => {
-            const departmentId = row.dataset.departmentId;
-
-            if (selectedDepartmentId === '' || departmentId === selectedDepartmentId) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
-        });
-    }
-
-    document.getElementById('search-input').addEventListener('input', searchEmployees);
+    document.getElementById('department-filter').addEventListener('change', function() {
+        document.getElementById('department-filter-form').submit();
+    });
 </script>
 
 {% endblock %}

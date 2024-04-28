@@ -2,6 +2,7 @@ import re
 from django.contrib import messages
 from django.contrib.auth.decorators  import login_required
 from django.shortcuts import render, redirect, get_object_or_404
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db import IntegrityError
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login as auth_login
@@ -64,6 +65,51 @@ def employee_list(request):
     all_employees = Employee.objects.all()
     active_employees = all_employees.filter(is_active=True)
     inactive_employees = all_employees.filter(is_active=False)
+    departments = Department.objects.all()
+    
+    status_filter = request.GET.get('status', 'active')
+    if status_filter == 'inactive':
+        employees = inactive_employees
+    elif status_filter == 'all':
+        employees = all_employees
+    else:
+        employees = active_employees
+
+    # Search functionality
+    search_query = request.GET.get('q')
+    if search_query:
+        employees = employees.filter(first_name__icontains=search_query)
+
+    # Department filter
+    department_filter = request.GET.get('department')
+    if department_filter:
+        employees = employees.filter(department_id=department_filter)
+
+    paginator = Paginator(employees, 10)  # Show 10 employees per page
+    page_number = request.GET.get('page')
+    try:
+        employees = paginator.page(page_number)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        employees = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        employees = paginator.page(paginator.num_pages)
+
+    context = {
+        'employees': employees,
+        'departments': departments,
+        'status_filter': status_filter,
+        'search_query': search_query,
+        'department_filter': department_filter,
+        'is_paginated': True,
+    }
+    
+    return render(request, 'employee_list.html', context)
+
+    all_employees = Employee.objects.all()
+    active_employees = all_employees.filter(is_active=True)
+    inactive_employees = all_employees.filter(is_active=False)
     
     departments = Department.objects.all()    
     
@@ -75,10 +121,20 @@ def employee_list(request):
     else:
         employees = active_employees
 
+    paginator = Paginator(employees, 10)  # Show 10 employees per page
+    page_number = request.GET.get('page')
+    try:
+        page_obj = paginator.get_page(page_number)
+    except PageNotAnInteger:
+        page_obj = paginator.get_page(1)
+    except EmptyPage:
+        page_obj = paginator.get_page(paginator.num_pages)
+
     context = {
         'employees': employees,
         'departments': departments,
         'status_filter': status_filter,
+        'page_obj': page_obj
     }
     
     return render(request, 'employee_list.html', context)
@@ -132,7 +188,16 @@ def employee_detail(request, pk):
 @login_required
 def department_list(request):
     departments = Department.objects.all()
-    return render(request, 'department_list.html', {'departments': departments})
+    paginator = Paginator(departments, 10)  # Show 10 positions per page
+    page_number = request.GET.get('page')
+    try:
+        page_obj = paginator.get_page(page_number)
+    except PageNotAnInteger:
+        page_obj = paginator.get_page(1)
+    except EmptyPage:
+        page_obj = paginator.get_page(paginator.num_pages)
+
+    return render(request, 'department_list.html', {'page_obj': page_obj})
 
 
 @login_required
@@ -173,7 +238,16 @@ def department_delete(request, pk):
 @login_required
 def position_list(request):
     positions = Position.objects.all()
-    return render(request, 'position_list.html', {'positions': positions})
+    paginator = Paginator(positions, 10)  # Show 10 positions per page
+    page_number = request.GET.get('page')
+    try:
+        page_obj = paginator.get_page(page_number)
+    except PageNotAnInteger:
+        page_obj = paginator.get_page(1)
+    except EmptyPage:
+        page_obj = paginator.get_page(paginator.num_pages)
+
+    return render(request, 'position_list.html', {'page_obj': page_obj})
 
 
 @login_required
@@ -220,7 +294,16 @@ def document_list(request):
     if search_query:
         documents = documents.filter(name__icontains=search_query)
 
-    return render(request, 'document_list.html', {'documents': documents, 'employee': employee})
+    paginator = Paginator(documents, 10)  # Show 10 documents per page
+    page_number = request.GET.get('page')
+    try:
+        page_obj = paginator.get_page(page_number)
+    except PageNotAnInteger:
+        page_obj = paginator.get_page(1)
+    except EmptyPage:
+        page_obj = paginator.get_page(paginator.num_pages)
+
+    return render(request, 'document_list.html', {'page_obj': page_obj, 'employee': employee})
 
 
 def document_create(request, employee_id=None):
