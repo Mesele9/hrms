@@ -19,8 +19,8 @@
                     {% if form.instance.pk %}value="{{ form.instance.name }}"{% endif %}>
             </div>
             <hr>
-            <button type="submit" class="btn btn-outline-primary">Save</button>
-            <a href="{% url 'hrms:position_list' %}" class="btn btn-outline-secondary ml-2">Cancel</a>
+            <button type="submit" class="btn btn-outline-primary" style="margin-right: 10px;">Save</button>
+            <a href="{% url 'hrms:position_list' %}" class="btn btn-outline-secondary">Cancel</a>
         </form>
     </div>
     
