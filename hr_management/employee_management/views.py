@@ -62,7 +62,7 @@ def dashboard(request):
 
 @login_required
 def employee_list(request):
-    all_employees = Employee.objects.all()
+    all_employees = Employee.objects.all().order_by('first_name')
     active_employees = all_employees.filter(is_active=True)
     inactive_employees = all_employees.filter(is_active=False)
     departments = Department.objects.all()
@@ -230,7 +230,7 @@ def employee_detail(request, pk):
 
 @login_required
 def department_list(request):
-    departments = Department.objects.all()
+    departments = Department.objects.all().order_by('name')
     paginator = Paginator(departments, 10)  # Show 10 positions per page
     page_number = request.GET.get('page')
     try:
@@ -280,7 +280,7 @@ def department_delete(request, pk):
 
 @login_required
 def position_list(request):
-    positions = Position.objects.all()
+    positions = Position.objects.all().order_by('name')
     paginator = Paginator(positions, 10)  # Show 10 positions per page
     page_number = request.GET.get('page')
     try:
@@ -330,7 +330,7 @@ def position_delete(request, pk):
 
 @login_required
 def document_list(request):
-    documents = Document.objects.all()
+    documents = Document.objects.all().order_by('date_uploaded')
     employee = Employee.objects.first()  # Example: Get the first employee
 
     search_query = request.GET.get('search_query')
