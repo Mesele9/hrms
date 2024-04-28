@@ -23,6 +23,13 @@ class EmployeeForm(forms.ModelForm):
                   'emergency_contact_name', 'emergency_contact_phone',
                   'is_coc_certified', 'is_active', 'picture']
         widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'First Name'}),
+            'middle_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Middle Name'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Last Name'}),
+            'mobile': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Mobile No'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'}),
+            #'department': forms.ChoiceField(attrs={'class': 'form-control'}),
+            #'position': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Position'}),
             'gender': forms.RadioSelect(),
             'date_of_birth': forms.DateInput(attrs={'type': 'date'}),
             'hire_date': forms.DateInput(attrs={'type': 'date'}),

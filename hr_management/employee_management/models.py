@@ -28,6 +28,7 @@ class Employee(models.Model):
         ('Degree', 'Bachelor\'s Degree'),
         ('Diploma', 'Diploma'),
         ('Certificate', 'Certificate'),
+        ('Grade', 'Grade'),
     )
 
     first_name = models.CharField(max_length=50)
@@ -55,7 +56,20 @@ class Employee(models.Model):
 
 
 class Document(models.Model):
-    name = models.CharField(max_length=100)
+
+    NAME_CHOICES = (
+        ('educational_document', 'Educational Document'),
+        ('kebele_id', 'Kebele ID'),
+        ('employment', 'Employement Letter'),
+        ('promotion', 'Promotions Letter'),
+        ('demotion', 'Demotion Letter'),
+        ('first_warning', 'First Warning'),
+        ('second_warning', 'Second Warning'),
+        ('third_warning', 'Third Warning'),
+        ('final_warning', 'Second Warning'),
+        ('termination', 'Termination Letter'),    
+    )
+    name = models.CharField(max_length=100, choices=NAME_CHOICES)
     file = models.FileField(upload_to=document_upload_to)
     description = models.TextField(blank=True)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
