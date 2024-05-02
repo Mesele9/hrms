@@ -2,6 +2,10 @@ from django.db import models
 from django.contrib.auth.models import User
 from datetime import date
 from .utils import document_upload_to
+from ethiopian_date import EthiopianDateConverter
+from django.utils import timezone
+from datetime import timedelta, datetime, date
+from dateutil.relativedelta import relativedelta
 
 class Department(models.Model):
     name = models.CharField(max_length=50)
@@ -18,6 +22,8 @@ class Position(models.Model):
 
 
 class Employee(models.Model):
+
+    et_calendar = EthiopianDateConverter()
 
     GENDER_CHOICES = (
         ('M', 'Male'),
@@ -54,8 +60,26 @@ class Employee(models.Model):
 
     def __str__(self):
         return f"{self.first_name} {self.middle_name}"
-
-
+    
+    # Convert date of birth to gregorian date
+    def gregorian_date_of_birth(self):
+        if self.date_of_birth:
+            ethiopian_date = self.date_of_birth
+            converted_date = self.et_calendar.to_gregorian(ethiopian_date.year, ethiopian_date.month, ethiopian_date.day)
+        else:
+            None
+        return converted_date
+    
+    # convert hire date to gregorian date
+    def gregorian_hire_date(self):
+        if self.hire_date:
+            ethiopian_date = self.hire_date
+            converted_date = self.et_calendar.to_gregorian(ethiopian_date.year, ethiopian_date.month, ethiopian_date.day)
+        else:
+            None
+        return converted_date
+    
+    
 class Document(models.Model):
 
     NAME_CHOICES = (

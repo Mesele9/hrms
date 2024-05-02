@@ -8,11 +8,10 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login as auth_login
 from django.db.models import Count
 from django.utils import timezone
-from datetime import timedelta, datetime, date
-from ethiopian_date import EthiopianDateConverter
-from dateutil.relativedelta import relativedelta
+from datetime import datetime
 from .models import Employee, Department, Position, Document
 from .forms import EmployeeForm, DepartmentForm, PositionForm, DocumentForm
+from .utils import is_upcoming_birthday, calculate_service_duration
 
 
 def home(request):
@@ -43,14 +42,9 @@ def dashboard(request):
     male_count = active_employees.filter(gender='M').count()
     female_count = active_employees.filter(gender='F').count()
     
-    today = datetime.today()
-    next_week = today + timedelta(days=7)
-    upcoming_birthdays = Employee.objects.filter(
-        date_of_birth__month=today.month,
-        date_of_birth__day__in=range(today.day, next_week.day)
-    ).order_by('-date_of_birth')
+    # List employees birthday coming in the next 7 days
+    upcoming_birthdays = [employee for employee in active_employees if is_upcoming_birthday(employee)]
 
-    
     context = {
         'department_data': department_data,
         'total_employees': total_employees,
@@ -64,7 +58,7 @@ def dashboard(request):
 
 @login_required
 def employee_list(request):
-    all_employees = Employee.objects.all().order_by('first_name')
+    all_employees = Employee.objects.all().order_by('id')
     active_employees = all_employees.filter(is_active=True)
     inactive_employees = all_employees.filter(is_active=False)
     departments = Department.objects.all()
@@ -87,24 +81,15 @@ def employee_list(request):
     if department_filter:
         employees = employees.filter(department_id=department_filter)
 
-    # Convert Ethiopian hire dates to Gregorian dates and calculate period of service
-    converter = EthiopianDateConverter()
-    today = timezone.now().date()
+    # Collect Employee period of service from the 
     for employee in employees:
         ethiopian_hire_date = employee.hire_date
         if ethiopian_hire_date:
-            gregorian_hire_date = converter.to_gregorian(ethiopian_hire_date.year, ethiopian_hire_date.month, ethiopian_hire_date.day)
-            service_duration = relativedelta(today, gregorian_hire_date)
-            if service_duration.years > 0:
-                employee.period_of_service = f"{service_duration.years} year, {service_duration.months} month and {service_duration.days} day"
-            elif service_duration.months > 0:
-                employee.period_of_service = f"{service_duration.months} month and {service_duration.days} day"
-            else:
-                employee.period_of_service = f"{service_duration.days} days"
+            employee.period_of_service = calculate_service_duration(ethiopian_hire_date)
         else:
             employee.period_of_service = "N/A"
 
-
+    # paginator
     paginator = Paginator(employees, 10)  # Show 10 employees per page
     page_number = request.GET.get('page')
     try:

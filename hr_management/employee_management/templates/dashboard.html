@@ -40,8 +40,8 @@
                 {% for employee in upcoming_birthdays %}
                 <li class="list-group-item">
                     <div class="d-flex justify-content-between">
-                        <span>{{ employee.first_name }} {{ employee.last_name }}</span>
-                        <span>{{ employee.date_of_birth|date:"F d" }}</span>
+                        <span>{{ employee.first_name }} {{ employee.middle_name }}</span>
+                        <span>{{ employee.gregorian_date_of_birth }}</span>
                     </div>
                 </li>
                 {% empty %}
