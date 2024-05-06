@@ -42,6 +42,14 @@ def dashboard(request):
     male_count = active_employees.filter(gender='M').count()
     female_count = active_employees.filter(gender='F').count()
     
+    # Educational level distribution
+    education_data = Employee.objects.filter(is_active=True).values('education_level').annotate(count=Count('education_level'))
+
+    # Assign colors for each education level
+    colors = ['#3e95cd', '#8e5ea2', '#3cba9f', '#e8c3b9', '#c4decc']
+    for i, data in enumerate(education_data):
+        data['color'] = colors[i % len(colors)]
+
     # List employees birthday coming in the next 7 days
     upcoming_birthdays = [employee for employee in active_employees if is_upcoming_birthday(employee)]
 
@@ -50,14 +58,76 @@ def dashboard(request):
         'total_employees': total_employees,
         'male_count': male_count,
         'female_count': female_count,
+        'education_data': education_data,
         'upcoming_birthdays': upcoming_birthdays
     }
 
     return render(request, 'dashboard.html', context)
 
 
+
 @login_required
 def employee_list(request):
+    all_employees = Employee.objects.all().order_by('id')
+    active_employees = all_employees.filter(is_active=True)
+    inactive_employees = all_employees.filter(is_active=False)
+    departments = Department.objects.all()
+
+    status_filter = request.GET.get('status', 'active')
+    if status_filter == 'inactive':
+        employees = inactive_employees
+    elif status_filter == 'all':
+        employees = all_employees
+    else:
+        employees = active_employees
+
+    # Search functionality
+    search_query = request.GET.get('q')
+    if search_query:
+        employees = employees.filter(first_name__icontains=search_query)
+
+    # Department filter
+    department_filter = request.GET.get('department')
+    if department_filter:
+        employees = employees.filter(department_id=department_filter)
+
+    # Educational level filter
+    education_filter = request.GET.get('education')
+    if education_filter:
+        employees = employees.filter(education_level=education_filter)
+
+    # Collect Employee period of service from the 
+    for employee in employees:
+        ethiopian_hire_date = employee.hire_date
+        if ethiopian_hire_date:
+            employee.period_of_service = calculate_service_duration(ethiopian_hire_date)
+        else:
+            employee.period_of_service = "N/A"
+
+    # paginator
+    paginator = Paginator(employees, 10)  # Show 10 employees per page
+    page_number = request.GET.get('page')
+    try:
+        page_obj = paginator.get_page(page_number)
+    except PageNotAnInteger:
+        page_obj = paginator.get_page(1)
+    except EmptyPage:
+        page_obj = paginator.get_page(paginator.num_pages)
+
+    context = {
+        'employees': page_obj,
+        'departments': departments,
+        'status_filter': status_filter,
+        'search_query': search_query,
+        'department_filter': department_filter,
+        'education_filter': education_filter,
+        'is_paginated': True,
+    }
+
+    return render(request, 'employee_list.html', context)
+
+
+def employee_list2(request):
     all_employees = Employee.objects.all().order_by('id')
     active_employees = all_employees.filter(is_active=True)
     inactive_employees = all_employees.filter(is_active=False)
