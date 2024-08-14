@@ -1,7 +1,7 @@
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources, fields
-from employee_management.models import Position, Department, Employee
+from employee_management.models import Position, Department, Employee, LeaveRecord, LeaveType
 from datetime import datetime
 
 # Resource class for Employee import/export
@@ -54,3 +54,5 @@ class EmployeeAdmin(ImportExportModelAdmin):
 
 admin.site.register(Department)
 admin.site.register(Position)
+admin.site.register(LeaveType)
+admin.site.register(LeaveRecord)

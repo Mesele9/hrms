@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import inlineformset_factory
-from .models import Employee, Department, Position, Document
+from .models import Employee, Department, LeaveRecord, Position, Document
 
 
 class DepartmentForm(forms.ModelForm):
@@ -39,6 +39,20 @@ class EmployeeForm(forms.ModelForm):
             'picture': forms.FileInput(attrs={'class': 'form-control'}),
         }
 
+
+class LeaveRecordForm(forms.ModelForm):
+    class Meta:
+        model = LeaveRecord
+        fields = ['employee', 'leave_type', 'start_date', 'end_date', 'reason', 'status']
+        widgets = {
+            'employee': forms.Select(attrs={'class': 'form-control select2'}),
+            'leave_type': forms.Select(attrs={'class': 'form-control'}),
+            'start_date': forms.DateInput(attrs={'type': 'date'}),
+            'end_date': forms.DateInput(attrs={'type': 'date'}),
+            'reason': forms.TextInput(attrs={'class': 'form-control'}),
+            'status': forms.Select(attrs={'class': 'form-control'}),
+        }
+        
 
 class DocumentForm(forms.ModelForm):
     class Meta:

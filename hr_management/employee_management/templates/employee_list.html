@@ -53,6 +53,7 @@
                     <th>Position</th>
                     <th>Department</th>
                     <th>Service Period</th>
+                    <th>Annual Leave Balance</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -63,6 +64,8 @@
                     <td>{{ employee.position }}</td>
                     <td>{{ employee.department.name }}</td>
                     <td>{{ employee.period_of_service }}</td>
+                    <td>{{ employee.get_annual_leave_balance }}</td>
+
                     <td>
                         <a href="{% url 'hrms:employee_update' employee.pk %}" class="btn btn-outline-dark btn-sm" style="margin-right: 10px;">Edit</a>
                     </td>

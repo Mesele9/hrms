@@ -122,6 +122,47 @@
                         </div>
                     </div>
                 </div>
+
+                <hr>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h5>Leave Records</h5>
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <a href="{% url 'hrms:add_leave_request' employee.pk %}" class="btn btn-outline-primary">Add Leave Request</a>
+                                </div>
+                            </div>
+                            {% if leave_records %}
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Type</th>
+                                        <th>Start Date</th>
+                                        <th>End Date</th>
+                                        <th>Total Days</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for record in leave_records %}
+                                    <tr>
+                                        <td>{{ record.leave_type.name }}</td>
+                                        <td>{{ record.start_date }}</td>
+                                        <td>{{ record.end_date }}</td>
+                                        <td>{{ record.get_total_days }}</td>
+                                        <td>{{ record.status }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+
+                            {% else %}
+                                <p>No leave record associated with this employee.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
                 <hr>
                 <div class="card-footer text-muted text-center">
                     {% if previous_employee %}
