@@ -4,8 +4,8 @@ from django.contrib.auth import views as auth_views
 from django.conf.urls.static import static
 from django.urls import path
 from .views import (
-    add_leave_request, home, dashboard, employee_list, employee_create, employee_update, employee_delete, employee_detail,
-    department_list, department_create, department_update, department_delete,
+    create_leave_record, home, dashboard, employee_list, employee_create, employee_update, employee_delete, employee_detail,
+    department_list, department_create, department_update, department_delete, leave_record_delete, leave_record_form, leave_record_list, leave_record_update,
     position_list, position_create, position_update, position_delete, 
     document_list, document_create, document_update, document_delete, document_upload_form,
     
@@ -48,7 +48,12 @@ urlpatterns = [
     path('documents/upload/', document_upload_form, name='document_upload_form'),
 
     # annula leave
-    path('add_leave_request/<int:pk>/', add_leave_request, name='add_leave_request'),
+    #path('add_leave_request/<int:pk>/', add_leave_request, name='add_leave_request'),
+    path('leave-records/', leave_record_list, name='leave_record_list'),
+    path('leave-records/create/', create_leave_record, name='create_leave_record'),
+    path('leave-records/create/<int:employee_id>/', create_leave_record, name='create_leave_record_with_employee'),
+    path('leave-records/<int:pk>/update/', leave_record_update, name='leave_record_update'),
+    path('leave-records/<int:pk>/delete/', leave_record_delete, name='leave_record_delete'),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

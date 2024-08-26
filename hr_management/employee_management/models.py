@@ -6,6 +6,8 @@ from ethiopian_date import EthiopianDateConverter
 from django.utils import timezone
 from datetime import timedelta, datetime, date
 from dateutil.relativedelta import relativedelta
+from decimal import Decimal
+
 
 class Department(models.Model):
     name = models.CharField(max_length=50)
@@ -57,7 +59,7 @@ class Employee(models.Model):
     is_coc_certified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     picture = models.ImageField(upload_to='employee_pictures/', null=True, blank=True)
-    accrued_annual_leave = models.DecimalField(max_digits=5, decimal_places=2, default=0.0)
+    accrued_annual_leave = models.DecimalField(max_digits=15, decimal_places=2, default=0.0)
     used_annual_leave = models.DecimalField(max_digits=5, decimal_places=2, default=0.0)
 
 
@@ -82,34 +84,69 @@ class Employee(models.Model):
             None
         return converted_date
 
+    def calculate_annual_leave_entitlement(self, years_of_service):
+        """Calculate the annual leave entitlement based on years of service."""
+        if years_of_service < 1:
+            return Decimal('16.0')  # For the first year
+        else:
+            base_days = Decimal('16.0')
+            additional_days = (years_of_service // 2) * Decimal('1.0')  # Add 1 day for every additional 2 years
+            return base_days + additional_days
+
     def update_annual_leave_balance(self):
         today = timezone.now().date()
         hire_date_gregorian = self.gregorian_hire_date()
         tenure_days = (today - hire_date_gregorian).days
 
-        if tenure_days >= 182:  # Employee is eligible after 6 months (approx 182 days)
+        if tenure_days >= 0:  # Employee is eligible for leave calculation
+            full_years = tenure_days // 365
+            remaining_days = tenure_days % 365
+
+            # Calculate annual leave for completed years
+            leave_days = self.calculate_annual_leave_entitlement(full_years)
+
+            # Add prorated leave days for the current incomplete year
+            prorated_days = (remaining_days / 365) * leave_days
+
+            total_leave_days = leave_days + prorated_days
+
+            self.accrued_annual_leave = Decimal(total_leave_days)
+            self.save()
+
+    @property
+    def annual_leave_balance(self):
+        accrued = Decimal(self.accrued_annual_leave) if self.accrued_annual_leave is not None else Decimal('0.0')
+        used = Decimal(self.used_annual_leave) if self.used_annual_leave is not None else Decimal('0.0')
+        return accrued - used
+
+    '''def update_annual_leave_balance(self):
+        today = timezone.now().date()
+        hire_date_gregorian = self.gregorian_hire_date()
+        tenure_days = (today - hire_date_gregorian).days
+
+        if tenure_days >= 182:  # Employee is eligible after 6 months
             full_years = tenure_days // 365
             remaining_days = tenure_days % 365
 
             leave_days = 0
-
             if full_years > 0:
                 leave_days += 16  # First year accrual
-                for year in range(1, full_years):
-                    leave_days += 16 + 0.5 * year
-
-            # Calculate the leave accrued for the remaining days
-            if remaining_days > 0:
-                increment = 16 + 0.5 * full_years
-                leave_days += (remaining_days / 365) * increment
+                leave_days += sum(16 + 0.5 * year for year in range(1, full_years))
+            leave_days += (remaining_days / 365) * (16 + 0.5 * full_years)
 
             self.accrued_annual_leave = leave_days
             self.save()
-    
-    #@property
-    def get_annual_leave_balance(self):
-        return self.accrued_annual_leave - self.used_annual_leave
 
+    @property
+    def annual_leave_balance(self):
+        accrued = Decimal(self.accrued_annual_leave) if self.accrued_annual_leave is not None else Decimal('0.0')
+        used = Decimal(self.used_annual_leave) if self.used_annual_leave is not None else Decimal('0.0')
+        return accrued - used
+
+    @property
+    def annual_leave_balance(self):
+        return self.accrued_annual_leave - self.used_annual_leave
+    '''
 
 class LeaveType(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -139,12 +176,13 @@ class LeaveRecord(models.Model):
         total_days = (self.end_date - self.start_date).days + 1
         return total_days
 
-
     def save(self, *args, **kwargs):
         if self.status == 'approved':
-            self.employee.used_annual_leave += self.get_total_days()
+            if self.leave_type.name == 'Annual Leave':
+                self.employee.used_annual_leave += self.get_total_days()
             self.employee.save()
-        super().save(*args, **kwargs)    
+        super().save(*args, **kwargs)
+
 
 class Document(models.Model):
 

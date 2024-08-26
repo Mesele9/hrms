@@ -40,6 +40,9 @@ class EmployeeForm(forms.ModelForm):
         }
 
 
+from django import forms
+from .models import LeaveRecord, Employee
+
 class LeaveRecordForm(forms.ModelForm):
     class Meta:
         model = LeaveRecord
@@ -47,13 +50,32 @@ class LeaveRecordForm(forms.ModelForm):
         widgets = {
             'employee': forms.Select(attrs={'class': 'form-control select2'}),
             'leave_type': forms.Select(attrs={'class': 'form-control'}),
-            'start_date': forms.DateInput(attrs={'type': 'date'}),
-            'end_date': forms.DateInput(attrs={'type': 'date'}),
+            'start_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'end_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'reason': forms.TextInput(attrs={'class': 'form-control'}),
             'status': forms.Select(attrs={'class': 'form-control'}),
         }
-        
+    
+    def __init__(self, *args, **kwargs):
+        include_employee_field = kwargs.pop('include_employee_field', True)
+        super().__init__(*args, **kwargs)
 
+        if not include_employee_field:
+            self.fields.pop('employee')  # Remove 'employee' field if not needed
+        else:
+            self.fields['employee'].queryset = Employee.objects.filter(is_active=True)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        start_date = cleaned_data.get('start_date')
+        end_date = cleaned_data.get('end_date')
+        
+        if start_date and end_date and start_date > end_date:
+            raise forms.ValidationError("End date cannot be before start date.")
+
+        return cleaned_data
+    
+    
 class DocumentForm(forms.ModelForm):
     class Meta:
         model = Document

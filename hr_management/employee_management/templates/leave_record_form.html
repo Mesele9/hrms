@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if employee %}Update Leave Record{% else %}Create Leave Record{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>{% if employee %} {{ employee.first_name }} {{ employee.middle_name }} Leave Record {% else %}Create Leave Record{% endif %}</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            {% if form.employee %}
+                <label for="employee">Employee</label>
+                {{ form.employee }}
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <label for="leave_type">Leave Type</label>
+            {{ form.leave_type }}
+        </div>
+        <div class="form-group">
+            <label for="start_date">Start Date</label>
+            {{ form.start_date }}
+        </div>
+        <div class="form-group">
+            <label for="end_date">End Date</label>
+            {{ form.end_date }}
+        </div>
+        <div class="form-group">
+            <label for="reason">Reason</label>
+            {{ form.reason }}
+        </div>
+        <div class="form-group">
+            <label for="status">Status</label>
+            {{ form.status }}
+        </div>
+        <button type="submit" class="btn btn-success">Save</button>
+        <a href="{% url 'hrms:leave_record_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

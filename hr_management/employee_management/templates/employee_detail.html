@@ -129,11 +129,11 @@
                             <h5>Leave Records</h5>
                             <div class="row mb-3">
                                 <div class="col-md-12">
-                                    <a href="{% url 'hrms:add_leave_request' employee.pk %}" class="btn btn-outline-primary">Add Leave Request</a>
+                                    <a href="{% url 'hrms:create_leave_record_with_employee' employee_id=employee.pk %}" class="btn btn-outline-primary">Add Leave Request</a>
                                 </div>
                             </div>
                             {% if leave_records %}
-                            <table>
+                            <table class="table">
                                 <thead>
                                     <tr>
                                         <th>Type</th>
@@ -155,7 +155,6 @@
                                     {% endfor %}
                                 </tbody>
                             </table>
-
                             {% else %}
                                 <p>No leave record associated with this employee.</p>
                             {% endif %}

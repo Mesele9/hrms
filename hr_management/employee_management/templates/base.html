@@ -17,9 +17,6 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav nav-tabs">
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'hrms:dashboard' %}">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link" href="{% url 'hrms:employee_list' %}">Employees</a>
                     </li>
                     <li class="nav-item">
@@ -27,6 +24,9 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'hrms:position_list' %}">Positions</a>
+                    </li>
+                    <li class="nav-item">
+                    <a class="nav-link" href="{% url 'hrms:leave_record_list' %}">Leave Records</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'hrms:document_list' %}">Documents</a>

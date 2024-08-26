@@ -67,6 +67,71 @@ def dashboard(request):
 
 @login_required
 def employee_list(request):
+    # Initial query to get all employees, can be filtered later
+    employees = Employee.objects.all()
+    departments = Department.objects.all()
+
+    # Status filter
+    status_filter = request.GET.get('status', 'active')
+    if status_filter == 'inactive':
+        employees = employees.filter(is_active=False)
+    elif status_filter == 'all':
+        # No additional filter needed
+        pass
+    else:
+        employees = employees.filter(is_active=True)
+
+    # Search functionality
+    search_query = request.GET.get('q')
+    if search_query:
+        employees = employees.filter(first_name__icontains=search_query)
+
+    # Department filter
+    department_filter = request.GET.get('department')
+    if department_filter:
+        employees = employees.filter(department_id=department_filter)
+
+    # Educational level filter
+    education_filter = request.GET.get('education')
+    if education_filter:
+        employees = employees.filter(education_level=education_filter)
+
+    # Pagination
+    paginator = Paginator(employees, 10)  # Show 10 employees per page
+    page_number = request.GET.get('page')
+    try:
+        page_obj = paginator.get_page(page_number)
+    except PageNotAnInteger:
+        page_obj = paginator.get_page(1)
+    except EmptyPage:
+        page_obj = paginator.get_page(paginator.num_pages)
+
+    # Calculate service duration and annual leave balance
+    for employee in page_obj:
+        hire_date = employee.hire_date
+        if hire_date:
+            employee.period_of_service = calculate_service_duration(hire_date)
+        else:
+            employee.period_of_service = "N/A"
+        # Assuming update_annual_leave_balance method exists and works correctly
+        employee.update_annual_leave_balance()
+
+    context = {
+        'employees': page_obj,
+        'departments': departments,
+        'status_filter': status_filter,
+        'search_query': search_query,
+        'department_filter': department_filter,
+        'education_filter': education_filter,
+        'is_paginated': True,
+    }
+
+    return render(request, 'employee_list.html', context)
+
+
+
+""" @login_required
+def employee_list(request):
     all_employees = Employee.objects.all().order_by('id')
     active_employees = all_employees.filter(is_active=True)
     inactive_employees = all_employees.filter(is_active=False)
@@ -104,8 +169,8 @@ def employee_list(request):
             employee.period_of_service = "N/A"
 
     for employee in employees:
-        employee.update_annual_leave_balance
-        print(employee.first_name, employee.accrued_annual_leave, employee.used_annual_leave)
+        employee.update_annual_leave_balance()
+        #print(employee.first_name, employee.accrued_annual_leave, employee.used_annual_leave)
     # paginator
     paginator = Paginator(employees, 10)  # Show 10 employees per page
     page_number = request.GET.get('page')
@@ -127,7 +192,7 @@ def employee_list(request):
     }
 
     return render(request, 'employee_list.html', context)
-
+ """
 
 @login_required
 def employee_create(request):
@@ -168,7 +233,7 @@ def employee_delete(request, pk):
 def employee_detail(request, pk):
     employee = get_object_or_404(Employee, pk=pk)
     leave_records = LeaveRecord.objects.filter(employee=employee)
-    leave_balance = employee.get_annual_leave_balance()
+    leave_balance = employee.annual_leave_balance
     documents = Document.objects.filter(employee=employee)
     next_employee = Employee.objects.filter(is_active=True, id__gt=pk).order_by('pk').first()  # Get the next employee
     previous_employee = Employee.objects.filter(is_active=True, id__lt=employee.id).order_by('-pk').first() # Get the previous employee
@@ -176,33 +241,176 @@ def employee_detail(request, pk):
     return render(request, 'employee_detail.html', context)    
 
 
-def add_leave_request(request, pk):
-    employee = get_object_or_404(Employee, pk=pk)
+@login_required
+def leave_record_list(request):
+    search_query = request.GET.get('search_query', '').strip()
+    leave_records = LeaveRecord.objects.select_related('employee').order_by('-created_at')
+
+    if search_query:
+        leave_records = leave_records.filter(employee__first_name__icontains=search_query)
+
+    paginator = Paginator(leave_records, 15)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'leave_records': page_obj,
+        'search_query': search_query,
+        'is_paginated': page_obj.has_other_pages(),
+    }
+
+    return render(request, 'leave_record_list.html', context)
+
+@login_required
+def create_leave_record(request, employee_id=None):
+    employee = get_object_or_404(Employee, pk=employee_id) if employee_id else None
+    return leave_record_form(request, include_employee_field=not bool(employee), employee=employee)
+
+@login_required
+def leave_record_update(request, pk):
+    leave_record = get_object_or_404(LeaveRecord, pk=pk)
     if request.method == 'POST':
-        form = LeaveRecordForm(request.POST)
+        form = LeaveRecordForm(request.POST, instance=leave_record)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Leave record updated successfully.')
+            return redirect('hrms:leave_record_list')
+    else:
+        form = LeaveRecordForm(instance=leave_record)
+    return render(request, 'leave_record_form.html', {'form': form})
+
+@login_required
+def leave_record_delete(request, pk):
+    leave_record = get_object_or_404(LeaveRecord, pk=pk)
+    leave_record.delete()
+    messages.success(request, 'Leave record deleted successfully.')
+    return redirect('hrms:leave_record_list')
+
+@login_required
+def leave_record_form(request, include_employee_field=True, employee=None):
+    if request.method == 'POST':
+        form = LeaveRecordForm(request.POST, include_employee_field=include_employee_field)
         if form.is_valid():
             leave_record = form.save(commit=False)
-            leave_record.employee = employee
+            leave_record.employee = employee or leave_record.employee
             total_days = leave_record.get_total_days()
 
-            if total_days > employee.get_annual_leave_balance():
+            # Check if there's enough leave balance before saving
+            if leave_record.leave_type.name == 'Annual Leave' and total_days > leave_record.employee.annual_leave_balance:
                 messages.error(request, "Insufficient leave balance.")
-                return redirect('add_leave_request', pk=employee.pk)
+                return redirect('create_leave_record_with_employee', employee_id=leave_record.employee.pk)
+
+            if leave_record.leave_type.name == 'Annual Leave':
+                leave_record.employee.used_annual_leave += total_days
+                leave_record.employee.save()
 
             leave_record.save()
-            employee.used_annual_leave += total_days
-            employee.save()
             messages.success(request, 'Leave record added successfully.')
-            return redirect('hrms:employee_detail', pk=employee.pk)
+            return redirect('hrms:leave_record_list')
     else:
-        form = LeaveRecordForm()
+        form = LeaveRecordForm(include_employee_field=include_employee_field)
+
+    context = {'form': form}
+    if employee:
+        context['employee'] = employee
+    return render(request, 'leave_record_form.html', context)
+
+
+""" 
+@login_required
+def leave_record_list(request):
+    leave_records = LeaveRecord.objects.all().order_by('-created_at')
+
+    search_query = request.GET.get('search_query')
+    if search_query:
+        leave_records = leave_records.filter(employee__first_name__icontains=search_query)
+
+    paginator = Paginator(leave_records, 15)  # Show 15 leave records per page
+    page_number = request.GET.get('page')
+    try:
+        page_obj = paginator.get_page(page_number)
+    except PageNotAnInteger:
+        page_obj = paginator.get_page(1)
+    except EmptyPage:
+        page_obj = paginator.get_page(paginator.num_pages)
+
+    context = {
+        'leave_records': page_obj,
+        'search_query': search_query,
+        'is_paginated': True,
+    }
+
+    return render(request, 'leave_record_list.html', context)
+
+@login_required
+def create_leave_record(request, employee_id=None):
+    if employee_id:
+        employee = get_object_or_404(Employee, pk=employee_id)
+        return leave_record_form(request, include_employee_field=False, employee=employee)
+    else:
+        return leave_record_form(request, include_employee_field=True)
+
+@login_required
+def leave_record_update(request, pk):
+    leave_record = get_object_or_404(LeaveRecord, pk=pk)
+    if request.method == 'POST':
+        form = LeaveRecordForm(request.POST, instance=leave_record)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Leave record updated successfully.')
+            return redirect('hrms:leave_record_list')
+    else:
+        form = LeaveRecordForm(instance=leave_record)
+    return render(request, 'leave_record_form.html', {'form': form})
+
+@login_required
+def leave_record_delete(request, pk):
+    leave_record = get_object_or_404(LeaveRecord, pk=pk)
+    leave_record.delete()
+    messages.success(request, 'Leave record deleted successfully.')
+    return redirect('hrms:leave_record_list')
+
+
+@login_required
+def leave_record_form(request, include_employee_field=True, employee=None):
+    if request.method == 'POST':
+        form = LeaveRecordForm(request.POST, include_employee_field=include_employee_field)
+        if form.is_valid():
+            leave_record = form.save(commit=False)
+
+            if not employee:  # If employee not passed in, take from form
+                employee = leave_record.employee
+            else:
+                leave_record.employee = employee
+
+            total_days = leave_record.get_total_days()
+
+            # Check if there's enough leave balance before saving
+            if leave_record.leave_type == 'Annual Leave' and total_days > employee.get_annual_leave_balance():
+                messages.error(request, "Insufficient leave balance.")
+                return redirect('create_leave_record_with_employee', employee_id=employee.pk)
+
+            # Update the used leave and save the leave record
+            if leave_record.leave_type == 'Annual Leave':
+                employee.used_annual_leave += total_days
+            leave_record.save()
+            employee.save()
+
+            messages.success(request, 'Leave record added successfully.')
+            return redirect('hrms:leave_record_list')
+    else:
+        form = LeaveRecordForm(include_employee_field=include_employee_field)
 
     context = {
         'form': form,
-        'employee': employee,
     }
-    return render(request, 'add_leave_request.html', context)
 
+    if employee:
+        context['employee'] = employee
+
+    return render(request, 'leave_record_form.html', context)
+
+"""
 
 @login_required
 def department_list(request):
